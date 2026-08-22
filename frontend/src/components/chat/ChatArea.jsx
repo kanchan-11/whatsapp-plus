@@ -9,7 +9,7 @@ import { MessageList } from './MessageList';
 import { MessageInput } from './MessageInput';
 import { MediaLightbox } from '../media/MediaLightbox';
 import { GroupInfoModal } from '../sidebar/GroupInfoModal';
-import { Lock, MessageSquare, PhoneCall, Radio, Video, Users } from 'lucide-react';
+import { Lock, MessageSquare, PhoneCall, Radio, Video, Zap, ShieldCheck } from 'lucide-react';
 
 export const ChatArea = ({
   chat,
@@ -79,7 +79,7 @@ export const ChatArea = ({
       }
     });
 
-    // 2. Subscribe to message status updates (e.g. read receipts / blue ticks)
+    // 2. Subscribe to message status updates
     const statusSub = subscribe(`/topic/chat.${chat.id}.status`, (statusFrame) => {
       try {
         const update = JSON.parse(statusFrame.body);
@@ -147,24 +147,24 @@ export const ChatArea = ({
     }
   };
 
-  // If no chat selected, display WhatsApp Web welcome splash
+  // If no chat selected, display modern app welcome splash
   if (!chat) {
     return (
-      <div className="hidden md:flex flex-1 flex-col items-center justify-center bg-[#222e35] p-8 text-center border-b-[6px] border-[#00a884]">
+      <div className="hidden md:flex flex-1 flex-col items-center justify-center bg-[#0a0e17] chat-bg p-8 text-center select-none relative">
         <div className="max-w-md flex flex-col items-center">
-          <div className="w-20 h-20 bg-[#202c33] rounded-full flex items-center justify-center mb-6 shadow-inner text-[#00a884]">
-            <MessageSquare className="w-10 h-10" />
+          <div className="w-20 h-20 bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 rounded-3xl flex items-center justify-center mb-6 shadow-2xl shadow-indigo-500/30 text-white ring-4 ring-indigo-500/20">
+            <Zap className="w-10 h-10 fill-current" />
           </div>
-          <h1 className="text-3xl font-light text-[#e9edef] mb-3 tracking-tight">
-            WhatsApp Web
+          <h1 className="text-3xl font-extrabold text-white mb-3 tracking-tight">
+            Welcome to Nexus Chat
           </h1>
-          <p className="text-sm text-[#8696a0] leading-relaxed mb-8">
-            Send and receive live messages, create groups, share high-definition photos and videos, and make HD audio & video calls seamlessly.
+          <p className="text-sm text-slate-400 leading-relaxed mb-8">
+            Experience ultra-fast real-time messaging, multi-user HD voice and video rooms, media sharing, and end-to-end encryption.
           </p>
 
-          <div className="flex items-center gap-2 text-xs text-[#8696a0] bg-[#111b21]/60 px-4 py-2 rounded-full border border-white/5">
-            <Lock className="w-3.5 h-3.5 text-[#00a884]" />
-            End-to-end encrypted real-time communication
+          <div className="flex items-center gap-2 text-xs text-slate-300 bg-slate-900/80 px-4 py-2.5 rounded-full border border-slate-800 shadow-sm">
+            <ShieldCheck className="w-4 h-4 text-indigo-400" />
+            <span>End-to-end encrypted real-time communication</span>
           </div>
         </div>
       </div>
@@ -172,51 +172,51 @@ export const ChatArea = ({
   }
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#0b141a] overflow-hidden relative">
+    <div className="flex-1 flex flex-col h-full bg-[#0a0e17] chat-bg overflow-hidden relative">
       {/* Chat Header */}
       <ChatHeader
         chat={chat}
         currentUserId={user?.id}
         typingUsers={typingUsers}
-        onOpenGroupInfo={() => setIsGroupInfoOpen(false)}
+        onOpenGroupInfo={() => setIsGroupInfoOpen(true)}
       />
 
       {/* Ongoing Group Call Alert Banner */}
       {activeCallInGroup && (
-        <div className="bg-[#182229] border-b border-[#00a884]/30 px-4 py-2.5 flex items-center justify-between shadow-md z-10 animate-in slide-in-from-top-2 select-none">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-8 h-8 rounded-full bg-[#00a884]/20 border border-[#00a884]/50 flex items-center justify-center text-[#00a884] shrink-0 animate-pulse">
+        <div className="bg-gradient-to-r from-indigo-950/90 via-slate-900/95 to-violet-950/90 border-b border-indigo-500/30 px-5 py-3 flex items-center justify-between shadow-lg z-10 animate-in slide-in-from-top-2 select-none backdrop-blur-md">
+          <div className="flex items-center gap-3.5 min-w-0">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white shrink-0 shadow-md shadow-indigo-500/30 animate-pulse">
               {activeCallInGroup.callType === 'VIDEO' ? (
-                <Video className="w-4 h-4" />
+                <Video className="w-4.5 h-4.5" />
               ) : (
-                <PhoneCall className="w-4 h-4" />
+                <PhoneCall className="w-4.5 h-4.5" />
               )}
             </div>
 
             <div className="truncate">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-[#e9edef] truncate">
+                <span className="text-xs font-bold text-white truncate">
                   Ongoing Group {activeCallInGroup.callType === 'VIDEO' ? 'Video' : 'Voice'} Call
                 </span>
-                <span className="w-2 h-2 rounded-full bg-[#00a884] animate-ping shrink-0"></span>
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping shrink-0"></span>
               </div>
-              <p className="text-[11px] text-[#8696a0] truncate">
-                Started by <span className="text-[#00a884] font-medium">{activeCallInGroup.callerName}</span> • {activeCallInGroup.participants?.length || 1} joined
+              <p className="text-[11px] text-slate-400 truncate">
+                Started by <span className="text-indigo-300 font-medium">{activeCallInGroup.callerName}</span> • {activeCallInGroup.participants?.length || 1} connected
               </p>
             </div>
           </div>
 
           <div className="shrink-0 ml-3">
             {isAlreadyInThisCall ? (
-              <span className="px-3 py-1 bg-[#00a884]/15 border border-[#00a884]/40 text-[#00a884] text-xs font-medium rounded-xl flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#00a884]"></span>
+              <span className="px-3.5 py-1.5 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 text-xs font-semibold rounded-xl flex items-center gap-1.5 shadow-sm">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
                 In Call
               </span>
             ) : (
               <button
                 type="button"
                 onClick={() => joinActiveGroupCall(chat.id, activeCallInGroup)}
-                className="px-3.5 py-1.5 bg-[#00a884] hover:bg-[#00a884]/90 text-[#111b21] text-xs font-semibold rounded-xl transition flex items-center gap-1.5 shadow-md hover:scale-105 active:scale-95 cursor-pointer"
+                className="px-4 py-1.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-bold rounded-xl transition flex items-center gap-1.5 shadow-lg shadow-indigo-600/30 hover:scale-105 active:scale-95 cursor-pointer"
               >
                 <PhoneCall className="w-3.5 h-3.5" />
                 <span>Join Call</span>
@@ -228,7 +228,7 @@ export const ChatArea = ({
 
       {/* Message History List */}
       {isLoading ? (
-        <div className="flex-1 flex items-center justify-center text-xs text-[#8696a0]">
+        <div className="flex-1 flex items-center justify-center text-xs text-slate-400">
           Loading messages...
         </div>
       ) : (

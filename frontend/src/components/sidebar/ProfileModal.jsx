@@ -102,17 +102,17 @@ export const ProfileModal = ({ isOpen, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/75 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in">
-      <div className="w-full max-w-md bg-[#111b21] border border-[#222e35] rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in select-none">
+      <div className="w-full max-w-md bg-[#0f1422] border border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] shadow-indigo-950/30">
         {/* Header */}
-        <div className="px-5 py-4 bg-[#202c33] flex items-center justify-between border-b border-[#222e35]">
-          <h2 className="text-base font-semibold text-[#e9edef] flex items-center gap-2">
-            <User className="w-5 h-5 text-[#00a884]" />
+        <div className="px-6 py-4 bg-slate-900/80 flex items-center justify-between border-b border-slate-800">
+          <h2 className="text-base font-bold text-white flex items-center gap-2">
+            <User className="w-5 h-5 text-indigo-400" />
             Profile Settings
           </h2>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-[#8696a0] hover:text-[#e9edef] hover:bg-[#111b21]/50 transition cursor-pointer"
+            className="p-1 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -123,26 +123,26 @@ export const ProfileModal = ({ isOpen, onClose }) => {
           {/* Avatar preview */}
           <div className="flex flex-col items-center">
             <div className="relative group">
-              <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-[#202c33] shadow-lg bg-[#202c33] flex items-center justify-center ring-2 ring-[#00a884]/40">
+              <div className="w-24 h-24 rounded-3xl overflow-hidden border-4 border-slate-800 shadow-xl bg-slate-800 flex items-center justify-center ring-2 ring-indigo-500/40 p-0.5">
                 {isUploading ? (
-                  <Loader2 className="w-8 h-8 animate-spin text-[#00a884]" />
+                  <Loader2 className="w-8 h-8 animate-spin text-indigo-400" />
                 ) : (
                   <img
                     src={avatarUrl || user.avatarUrl || avatarIcons[0].url}
                     alt={user.username}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover rounded-2xl"
                   />
                 )}
               </div>
             </div>
-            <p className="text-xs text-[#8696a0] mt-1.5 font-medium">@{user.username}</p>
+            <p className="text-xs text-slate-400 mt-2 font-semibold">@{user.username}</p>
           </div>
 
           {/* Avatar Presets with Single Add Photo dropdown */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="text-[11px] font-medium text-[#8696a0] uppercase tracking-wider">
-                Choose Avatar Icon
+              <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                Avatar Icons
               </label>
 
               {/* Single Add Photo Dropdown */}
@@ -157,25 +157,25 @@ export const ProfileModal = ({ isOpen, onClose }) => {
                 <button
                   type="button"
                   onClick={() => setIsAddPhotoDropdownOpen((prev) => !prev)}
-                  className="py-1 px-2.5 bg-[#202c33] hover:bg-[#2a3942] border border-[#374248] rounded-lg text-[#00a884] text-xs font-medium transition cursor-pointer flex items-center gap-1.5 shadow-xs"
+                  className="py-1 px-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-indigo-400 text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 shadow-xs"
                 >
                   <Plus className="w-3.5 h-3.5" />
-                  <span>Add Photo</span>
+                  <span>Upload</span>
                   <ChevronDown className={`w-3 h-3 transition-transform ${isAddPhotoDropdownOpen ? 'rotate-180' : ''}`} />
                 </button>
 
                 {/* Dropdown Menu */}
                 {isAddPhotoDropdownOpen && (
-                  <div className="absolute right-0 top-full mt-1.5 w-44 bg-[#202c33] border border-[#374248] rounded-xl shadow-xl py-1 z-30 animate-in fade-in zoom-in-95">
+                  <div className="absolute right-0 top-full mt-1.5 w-44 bg-slate-900 border border-slate-750 rounded-2xl shadow-2xl py-1.5 z-30 animate-in fade-in zoom-in-95">
                     <button
                       type="button"
                       onClick={() => {
                         setIsAddPhotoDropdownOpen(false);
                         fileInputRef.current?.click();
                       }}
-                      className="w-full px-3 py-2 text-left text-xs text-[#e9edef] hover:bg-[#111b21] flex items-center gap-2.5 transition cursor-pointer"
+                      className="w-full px-3 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 flex items-center gap-2.5 transition cursor-pointer"
                     >
-                      <ImageIcon className="w-4 h-4 text-[#00a884]" />
+                      <ImageIcon className="w-4 h-4 text-indigo-400" />
                       <span>Choose from Gallery</span>
                     </button>
                     <button
@@ -184,9 +184,9 @@ export const ProfileModal = ({ isOpen, onClose }) => {
                         setIsAddPhotoDropdownOpen(false);
                         setIsCameraOpen(true);
                       }}
-                      className="w-full px-3 py-2 text-left text-xs text-[#e9edef] hover:bg-[#111b21] flex items-center gap-2.5 transition cursor-pointer"
+                      className="w-full px-3 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 flex items-center gap-2.5 transition cursor-pointer"
                     >
-                      <Camera className="w-4 h-4 text-[#00a884]" />
+                      <Camera className="w-4 h-4 text-violet-400" />
                       <span>Take with Camera</span>
                     </button>
                   </div>
@@ -194,7 +194,7 @@ export const ProfileModal = ({ isOpen, onClose }) => {
               </div>
             </div>
 
-            {/* Horizontal list with adequate vertical padding to prevent hover crop */}
+            {/* Horizontal list */}
             <div className="py-2.5 px-1 overflow-x-auto overflow-y-visible no-scrollbar">
               <div className="flex items-center gap-2.5 min-w-max">
                 {avatarIcons.map((item, idx) => {
@@ -204,21 +204,21 @@ export const ProfileModal = ({ isOpen, onClose }) => {
                       key={idx}
                       type="button"
                       onClick={() => setAvatarUrl(item.url)}
-                      className={`relative w-10 h-10 rounded-full shrink-0 bg-[#202c33] border-2 transition-all duration-150 transform hover:scale-110 cursor-pointer overflow-hidden p-0.5 ${
+                      className={`relative w-10 h-10 rounded-2xl shrink-0 bg-slate-800 border-2 transition-all duration-150 transform hover:scale-110 cursor-pointer overflow-hidden p-0.5 ${
                         isSelected
-                          ? 'border-[#00a884] scale-110 shadow-lg ring-2 ring-[#00a884]/50'
-                          : 'border-transparent opacity-75 hover:opacity-100 hover:border-[#374248]'
+                          ? 'border-indigo-500 scale-110 shadow-lg shadow-indigo-500/30 ring-2 ring-indigo-500/40'
+                          : 'border-transparent opacity-75 hover:opacity-100 hover:border-slate-700'
                       }`}
                       title={item.label}
                     >
                       <img
                         src={item.url}
                         alt={item.label}
-                        className="w-full h-full object-cover rounded-full pointer-events-none"
+                        className="w-full h-full object-cover rounded-xl pointer-events-none"
                       />
                       {isSelected && (
-                        <div className="absolute inset-0 bg-[#00a884]/20 flex items-center justify-center rounded-full">
-                          <Check className="w-3 h-3 text-[#00a884] stroke-[3]" />
+                        <div className="absolute inset-0 bg-indigo-600/30 flex items-center justify-center rounded-xl">
+                          <Check className="w-3.5 h-3.5 text-indigo-400 stroke-[3]" />
                         </div>
                       )}
                     </button>
@@ -229,43 +229,43 @@ export const ProfileModal = ({ isOpen, onClose }) => {
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-[#8696a0] uppercase tracking-wider mb-1.5">
-              Your Display Name
+            <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+              Display Name
             </label>
             <input
               type="text"
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
               placeholder="Display Name"
-              className="w-full px-3.5 py-2.5 bg-[#202c33] border border-transparent focus:border-[#00a884] rounded-xl text-sm text-[#e9edef] placeholder-[#8696a0] outline-none transition"
+              className="w-full px-4 py-2.5 bg-slate-900 border border-slate-750 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 rounded-2xl text-sm text-slate-100 placeholder-slate-500 outline-none transition"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-[#8696a0] uppercase tracking-wider mb-1.5">
-              About / Status Bio
+            <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+              Status Bio
             </label>
             <input
               type="text"
               value={statusBio}
               onChange={(e) => setStatusBio(e.target.value)}
-              placeholder="Hey there! I am using WhatsApp."
-              className="w-full px-3.5 py-2.5 bg-[#202c33] border border-transparent focus:border-[#00a884] rounded-xl text-sm text-[#e9edef] placeholder-[#8696a0] outline-none transition"
+              placeholder="Hey there! I am using Nexus."
+              className="w-full px-4 py-2.5 bg-slate-900 border border-slate-750 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 rounded-2xl text-sm text-slate-100 placeholder-slate-500 outline-none transition"
             />
           </div>
 
-          <div className="pt-2 flex justify-end gap-2">
+          <div className="pt-2 flex justify-end gap-2.5">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl text-xs font-semibold text-[#8696a0] hover:text-[#e9edef] hover:bg-[#202c33] transition cursor-pointer"
+              className="px-4 py-2.5 rounded-2xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting || isUploading}
-              className="px-5 py-2.5 bg-[#00a884] hover:bg-[#00a884]/90 disabled:opacity-50 text-[#111b21] font-semibold text-xs rounded-xl transition flex items-center gap-2 cursor-pointer shadow-md"
+              className="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 disabled:opacity-50 text-white font-bold text-xs rounded-2xl transition flex items-center gap-2 cursor-pointer shadow-lg shadow-indigo-600/30"
             >
               {isSubmitting ? (
                 <Loader2 className="w-4 h-4 animate-spin" />

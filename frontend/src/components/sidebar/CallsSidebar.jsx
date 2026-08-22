@@ -5,17 +5,12 @@ import { NewChatModal } from './NewChatModal';
 import { 
   Phone, 
   Video, 
-  PhoneCall, 
   PhoneMissed, 
-  PhoneIncoming, 
-  PhoneOutgoing, 
   Search, 
   X, 
   Plus,
   ArrowUpRight,
-  ArrowDownLeft,
-  Calendar,
-  Clock
+  ArrowDownLeft
 } from 'lucide-react';
 import { format, isToday, isYesterday } from 'date-fns';
 
@@ -74,21 +69,23 @@ export const CallsSidebar = ({
   };
 
   return (
-    <div className="w-full md:w-96 lg:w-[420px] h-full bg-[#111b21] border-r border-[#222e35] flex flex-col shrink-0 select-none">
+    <div className="w-full md:w-96 lg:w-[410px] h-full bg-[#0f1422] border-r border-slate-800/80 flex flex-col shrink-0 select-none">
       {/* Top Header */}
-      <div className="h-16 bg-[#202c33] px-4 flex items-center justify-between border-b border-[#222e35]">
-        <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-[#00a884]/15 text-[#00a884] flex items-center justify-center font-bold">
-            <Phone className="w-5 h-5" />
-          </div>
-          <h2 className="text-lg font-bold text-[#e9edef] tracking-tight">Calls</h2>
+      <div className="h-18 px-5 flex items-center justify-between border-b border-slate-800/80 bg-[#0f1422]">
+        <div className="flex items-center gap-3">
+          <h2 className="text-xl font-bold text-slate-100 tracking-tight flex items-center gap-2">
+            <span>Call History</span>
+            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-400 border border-indigo-500/30">
+              {callLogs.length}
+            </span>
+          </h2>
         </div>
 
         {/* Start New Call Button */}
         <button
           type="button"
           onClick={() => setIsNewCallModalOpen(true)}
-          className="py-1.5 px-3 bg-[#00a884] hover:bg-[#00a884]/90 text-[#111b21] text-xs font-semibold rounded-xl transition cursor-pointer flex items-center gap-1.5 shadow-sm"
+          className="py-1.5 px-3 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-semibold rounded-xl transition cursor-pointer flex items-center gap-1.5 shadow-md shadow-indigo-600/30"
           title="New voice or video call"
         >
           <Plus className="w-4 h-4" />
@@ -97,20 +94,20 @@ export const CallsSidebar = ({
       </div>
 
       {/* Search and Filters */}
-      <div className="p-2.5 border-b border-[#222e35] space-y-2">
+      <div className="p-3.5 border-b border-slate-800/60 space-y-3 bg-[#0c101a]/50">
         <div className="relative">
-          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8696a0]" />
+          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search call logs"
-            className="w-full pl-10 pr-9 py-1.5 bg-[#202c33] text-sm text-[#e9edef] placeholder-[#8696a0] rounded-lg outline-none border border-transparent focus:border-[#00a884] transition"
+            placeholder="Search call logs..."
+            className="w-full pl-10 pr-9 py-2 bg-slate-900/90 text-sm text-slate-100 placeholder-slate-500 rounded-xl outline-none border border-slate-750 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition"
           />
           {search && (
             <button
               onClick={() => setSearch('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8696a0] hover:text-[#e9edef]"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -118,23 +115,23 @@ export const CallsSidebar = ({
         </div>
 
         {/* Filter Pills */}
-        <div className="flex gap-1.5 px-1">
+        <div className="flex gap-2">
           <button
             onClick={() => setFilter('ALL')}
-            className={`px-3 py-1 rounded-full text-xs font-medium transition cursor-pointer ${
+            className={`px-3.5 py-1 rounded-xl text-xs font-semibold transition cursor-pointer ${
               filter === 'ALL'
-                ? 'bg-[#00a884] text-[#111b21]'
-                : 'bg-[#202c33] text-[#8696a0] hover:bg-[#374248] hover:text-[#e9edef]'
+                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
+                : 'bg-slate-850 text-slate-400 hover:bg-slate-800 hover:text-slate-200'
             }`}
           >
             All Calls
           </button>
           <button
             onClick={() => setFilter('MISSED')}
-            className={`px-3 py-1 rounded-full text-xs font-medium transition cursor-pointer ${
+            className={`px-3.5 py-1 rounded-xl text-xs font-semibold transition cursor-pointer ${
               filter === 'MISSED'
-                ? 'bg-[#00a884] text-[#111b21]'
-                : 'bg-[#202c33] text-[#8696a0] hover:bg-[#374248] hover:text-[#e9edef]'
+                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
+                : 'bg-slate-850 text-slate-400 hover:bg-slate-800 hover:text-slate-200'
             }`}
           >
             Missed
@@ -143,19 +140,19 @@ export const CallsSidebar = ({
       </div>
 
       {/* Call Logs List */}
-      <div className="flex-1 overflow-y-auto divide-y divide-[#222e35]/50">
+      <div className="flex-1 overflow-y-auto px-2 py-2 space-y-1">
         {isLoading ? (
-          <div className="p-8 text-center text-xs text-[#8696a0]">
+          <div className="p-8 text-center text-xs text-slate-400">
             Loading call logs...
           </div>
         ) : filteredLogs.length === 0 ? (
-          <div className="p-8 text-center text-[#8696a0] space-y-3">
-            <div className="w-12 h-12 rounded-full bg-[#202c33] text-[#8696a0] flex items-center justify-center mx-auto mb-2">
+          <div className="p-8 text-center text-slate-400 space-y-3">
+            <div className="w-12 h-12 rounded-2xl bg-slate-800/80 text-slate-400 flex items-center justify-center mx-auto mb-2 border border-slate-700/50">
               <PhoneMissed className="w-6 h-6" />
             </div>
-            <p className="text-sm font-medium text-[#e9edef]">No call logs found</p>
-            <p className="text-xs text-[#8696a0]">
-              To make a call, select a contact or click New Call above.
+            <p className="text-sm font-medium text-slate-300">No call logs found</p>
+            <p className="text-xs text-slate-500">
+              Your incoming, outgoing, and group call logs will appear here.
             </p>
           </div>
         ) : (
@@ -167,31 +164,31 @@ export const CallsSidebar = ({
             return (
               <div
                 key={log.id}
-                className="px-4 py-3 hover:bg-[#202c33] transition flex items-center justify-between gap-3 group"
+                className="px-3.5 py-3 rounded-2xl hover:bg-slate-800/50 transition flex items-center justify-between gap-3 group border border-transparent hover:border-slate-750"
               >
                 {/* Avatar & User Details */}
-                <div className="flex items-center gap-3 truncate min-w-0">
+                <div className="flex items-center gap-3.5 truncate min-w-0">
                   <div className="relative shrink-0">
                     <img
                       src={partner?.avatarUrl || `https://api.dicebear.com/7.x/bottts/svg?seed=${partner?.username}`}
                       alt={partner?.displayName || partner?.username}
-                      className="w-11 h-11 rounded-full object-cover border border-[#374248]"
+                      className="w-11 h-11 rounded-2xl object-cover border border-slate-700/80 bg-slate-800"
                     />
                   </div>
 
                   <div className="truncate min-w-0">
-                    <h3 className={`text-sm font-semibold truncate ${isMissed ? 'text-red-400' : 'text-[#e9edef]'}`}>
+                    <h3 className={`text-sm font-semibold truncate ${isMissed ? 'text-rose-400' : 'text-slate-100'}`}>
                       {partner?.displayName || partner?.username || 'Unknown'}
                     </h3>
 
-                    <div className="flex items-center gap-1.5 text-xs text-[#8696a0] mt-0.5">
+                    <div className="flex items-center gap-1.5 text-xs text-slate-400 mt-0.5">
                       {/* Direction Icon */}
                       {log.outgoing ? (
-                        <ArrowUpRight className="w-3.5 h-3.5 text-[#00a884] shrink-0" />
+                        <ArrowUpRight className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                       ) : isMissed ? (
-                        <ArrowDownLeft className="w-3.5 h-3.5 text-red-400 shrink-0" />
+                        <ArrowDownLeft className="w-3.5 h-3.5 text-rose-400 shrink-0" />
                       ) : (
-                        <ArrowDownLeft className="w-3.5 h-3.5 text-[#00a884] shrink-0" />
+                        <ArrowDownLeft className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
                       )}
 
                       <span className="truncate">
@@ -203,12 +200,12 @@ export const CallsSidebar = ({
                 </div>
 
                 {/* Quick Call Action Buttons */}
-                <div className="flex items-center gap-1 shrink-0">
+                <div className="flex items-center gap-1.5 shrink-0">
                   <button
                     type="button"
                     onClick={() => handleCallUser(partner, 'AUDIO')}
                     title="Audio call"
-                    className="p-2 rounded-full text-[#00a884] hover:bg-[#00a884]/20 hover:text-[#00a884] transition cursor-pointer"
+                    className="p-2 rounded-xl text-slate-300 hover:text-white bg-slate-800/60 hover:bg-indigo-600 transition cursor-pointer border border-slate-700/40"
                   >
                     <Phone className="w-4 h-4" />
                   </button>
@@ -216,7 +213,7 @@ export const CallsSidebar = ({
                     type="button"
                     onClick={() => handleCallUser(partner, 'VIDEO')}
                     title="Video call"
-                    className="p-2 rounded-full text-[#00a884] hover:bg-[#00a884]/20 hover:text-[#00a884] transition cursor-pointer"
+                    className="p-2 rounded-xl text-slate-300 hover:text-white bg-slate-800/60 hover:bg-violet-600 transition cursor-pointer border border-slate-700/40"
                   >
                     <Video className="w-4 h-4" />
                   </button>

@@ -57,45 +57,45 @@ export const ChatHeader = ({ chat, currentUserId, typingUsers, onOpenGroupInfo }
   };
 
   return (
-    <div className="h-16 bg-[#202c33] px-4 flex items-center justify-between border-b border-[#222e35] z-10 select-none">
+    <div className="h-18 bg-[#0f1422] px-6 flex items-center justify-between border-b border-slate-800/80 z-10 select-none">
       {/* Avatar & User/Group info */}
       <div
         onClick={chat.type === 'GROUP' ? onOpenGroupInfo : undefined}
-        className={`flex items-center gap-3 min-w-0 ${chat.type === 'GROUP' ? 'cursor-pointer hover:opacity-90' : ''}`}
+        className={`flex items-center gap-3.5 min-w-0 ${chat.type === 'GROUP' ? 'cursor-pointer hover:opacity-90' : ''}`}
       >
         <div className="relative shrink-0">
           <img
             src={chat.image || `https://api.dicebear.com/7.x/initials/svg?seed=${chat.name || 'Chat'}`}
             alt={chat.name}
-            className="w-10 h-10 rounded-full object-cover bg-[#111b21] border border-[#374248]"
+            className="w-11 h-11 rounded-2xl object-cover bg-slate-800 border border-slate-700/80 shadow-xs"
           />
           {chat.type === 'DIRECT' && isOtherOnline && (
-            <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-[#00a884] border-2 border-[#202c33] rounded-full"></span>
+            <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 border-2 border-[#0f1422] rounded-full shadow-xs"></span>
           )}
         </div>
 
         <div className="truncate">
           <div className="flex items-center gap-2">
-            <h2 className="text-sm font-semibold text-[#e9edef] truncate">{chat.name}</h2>
+            <h2 className="text-base font-bold text-slate-100 truncate">{chat.name}</h2>
             {activeCallInGroup && (
-              <span className="px-2 py-0.5 bg-[#00a884]/20 border border-[#00a884]/40 text-[#00a884] text-[10px] font-semibold rounded-full flex items-center gap-1 animate-pulse">
+              <span className="px-2 py-0.5 bg-indigo-500/20 border border-indigo-500/40 text-indigo-400 text-[10px] font-bold rounded-full flex items-center gap-1 animate-pulse shadow-xs">
                 <Radio className="w-3 h-3" />
                 <span>Call Active</span>
               </span>
             )}
           </div>
 
-          <p className="text-xs truncate">
+          <p className="text-xs truncate text-slate-400">
             {isTyping ? (
-              <span className="text-[#00a884] font-medium animate-pulse">{typingText}</span>
+              <span className="text-indigo-400 font-medium animate-pulse">{typingText}</span>
             ) : chat.type === 'DIRECT' ? (
               isOtherOnline ? (
-                <span className="text-[#00a884] font-medium">online</span>
+                <span className="text-emerald-400 font-medium">Online</span>
               ) : (
-                <span className="text-[#8696a0]">offline</span>
+                <span className="text-slate-500">Offline</span>
               )
             ) : (
-              <span className="text-[#8696a0]">
+              <span className="text-slate-400">
                 {activeCallInGroup
                   ? `${activeCallInGroup.participants?.length || 1} in call • ${chat.members?.length || 0} participants`
                   : `${chat.members?.length || 0} participants`}
@@ -106,13 +106,13 @@ export const ChatHeader = ({ chat, currentUserId, typingUsers, onOpenGroupInfo }
       </div>
 
       {/* Action Buttons: Voice Call, Video Call, Group Info */}
-      <div className="flex items-center gap-1.5 text-[#aebac1]">
+      <div className="flex items-center gap-2 text-slate-300">
         {/* Quick Join Call Button if call active in group */}
         {activeCallInGroup && !isAlreadyInThisCall && (
           <button
             type="button"
             onClick={() => joinActiveGroupCall(chat.id, activeCallInGroup)}
-            className="px-3 py-1.5 bg-[#00a884] hover:bg-[#00a884]/90 text-[#111b21] text-xs font-semibold rounded-xl transition flex items-center gap-1.5 shadow-md animate-bounce cursor-pointer mr-1"
+            className="px-3.5 py-1.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-semibold rounded-xl transition flex items-center gap-1.5 shadow-md shadow-indigo-600/30 animate-bounce cursor-pointer mr-1"
           >
             <PhoneCall className="w-3.5 h-3.5" />
             <span>Join Call</span>
@@ -129,13 +129,13 @@ export const ChatHeader = ({ chat, currentUserId, typingUsers, onOpenGroupInfo }
                 : 'Start Group Voice Call'
               : 'Voice Call'
           }
-          className={`p-2.5 rounded-full transition cursor-pointer ${
+          className={`p-2.5 rounded-xl transition cursor-pointer border ${
             activeCallInGroup && activeCallInGroup.callType === 'AUDIO'
-              ? 'bg-[#00a884]/20 text-[#00a884] ring-2 ring-[#00a884]'
-              : 'hover:bg-[#374248] hover:text-[#00a884]'
+              ? 'bg-indigo-600 text-white border-indigo-400 shadow-md shadow-indigo-600/30'
+              : 'bg-slate-800/60 hover:bg-indigo-600 hover:text-white border-slate-700/50'
           }`}
         >
-          <Phone className="w-5 h-5" />
+          <Phone className="w-4 h-4" />
         </button>
 
         <button
@@ -148,13 +148,13 @@ export const ChatHeader = ({ chat, currentUserId, typingUsers, onOpenGroupInfo }
                 : 'Start Group Video Call'
               : 'Video Call'
           }
-          className={`p-2.5 rounded-full transition cursor-pointer ${
+          className={`p-2.5 rounded-xl transition cursor-pointer border ${
             activeCallInGroup && activeCallInGroup.callType === 'VIDEO'
-              ? 'bg-[#00a884]/20 text-[#00a884] ring-2 ring-[#00a884]'
-              : 'hover:bg-[#374248] hover:text-[#00a884]'
+              ? 'bg-violet-600 text-white border-violet-400 shadow-md shadow-violet-600/30'
+              : 'bg-slate-800/60 hover:bg-violet-600 hover:text-white border-slate-700/50'
           }`}
         >
-          <Video className="w-5 h-5" />
+          <Video className="w-4 h-4" />
         </button>
 
         {chat.type === 'GROUP' && (
@@ -162,9 +162,9 @@ export const ChatHeader = ({ chat, currentUserId, typingUsers, onOpenGroupInfo }
             type="button"
             onClick={onOpenGroupInfo}
             title="Group Info"
-            className="p-2.5 rounded-full hover:bg-[#374248] hover:text-[#e9edef] transition cursor-pointer"
+            className="p-2.5 rounded-xl bg-slate-800/60 hover:bg-slate-700 hover:text-white border border-slate-700/50 transition cursor-pointer"
           >
-            <Users className="w-5 h-5" />
+            <Users className="w-4 h-4" />
           </button>
         )}
       </div>

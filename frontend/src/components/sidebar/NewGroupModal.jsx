@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { authService } from '../../services/authService';
-import { Users, X, Check, Loader2, Image as ImageIcon } from 'lucide-react';
+import { Users, X, Check, Loader2 } from 'lucide-react';
 
 export const NewGroupModal = ({ isOpen, onClose, onCreateGroup }) => {
   const [name, setName] = useState('');
@@ -12,7 +12,7 @@ export const NewGroupModal = ({ isOpen, onClose, onCreateGroup }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
-  // Sample group avatars
+  // Modern preset group avatars
   const groupAvatars = [
     'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=150&auto=format&fit=crop&q=80',
     'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=150&auto=format&fit=crop&q=80',
@@ -81,32 +81,32 @@ export const NewGroupModal = ({ isOpen, onClose, onCreateGroup }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-      <div className="w-full max-w-lg bg-[#111b21] border border-[#222e35] rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in select-none">
+      <div className="w-full max-w-lg bg-[#0f1422] border border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] shadow-indigo-950/40">
         {/* Header */}
-        <div className="px-5 py-4 bg-[#202c33] flex items-center justify-between border-b border-[#222e35]">
-          <h2 className="text-lg font-semibold text-[#e9edef] flex items-center gap-2">
-            <Users className="w-5 h-5 text-[#00a884]" />
-            New Group
+        <div className="px-6 py-4 bg-slate-900/80 flex items-center justify-between border-b border-slate-800">
+          <h2 className="text-base font-bold text-white flex items-center gap-2">
+            <Users className="w-5 h-5 text-indigo-400" />
+            Create New Group
           </h2>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-[#8696a0] hover:text-[#e9edef] hover:bg-[#111b21]/50 transition cursor-pointer"
+            className="p-1 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Content */}
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-5 space-y-4">
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-4">
           {error && (
-            <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-xs">
+            <div className="p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-400 text-xs">
               {error}
             </div>
           )}
 
           <div>
-            <label className="block text-xs font-medium text-[#8696a0] uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">
               Group Name *
             </label>
             <input
@@ -114,37 +114,37 @@ export const NewGroupModal = ({ isOpen, onClose, onCreateGroup }) => {
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. React Developers, Family & Friends"
-              className="w-full px-3.5 py-2.5 bg-[#202c33] border border-transparent focus:border-[#00a884] rounded-xl text-sm text-[#e9edef] placeholder-[#8696a0] outline-none transition"
+              placeholder="e.g. Design Team, Core Engineers"
+              className="w-full px-4 py-2.5 bg-slate-900 border border-slate-750 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 rounded-2xl text-sm text-slate-100 placeholder-slate-500 outline-none transition"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-[#8696a0] uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">
               Description (Optional)
             </label>
             <input
               type="text"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Group topic or purpose"
-              className="w-full px-3.5 py-2 bg-[#202c33] border border-transparent focus:border-[#00a884] rounded-xl text-sm text-[#e9edef] placeholder-[#8696a0] outline-none transition"
+              placeholder="Group topic, channel purpose or rules"
+              className="w-full px-4 py-2.5 bg-slate-900 border border-slate-750 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 rounded-2xl text-sm text-slate-100 placeholder-slate-500 outline-none transition"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-[#8696a0] uppercase tracking-wider mb-1.5">
-              Group Icon
+            <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+              Group Icon Preset
             </label>
-            <div className="flex gap-2 mb-2">
+            <div className="flex gap-2.5 mb-2">
               {groupAvatars.map((url, idx) => (
                 <img
                   key={idx}
                   src={url}
                   alt="group icon"
                   onClick={() => setImage(url)}
-                  className={`w-10 h-10 rounded-xl object-cover cursor-pointer border-2 transition ${
-                    image === url ? 'border-[#00a884] scale-105' : 'border-transparent opacity-60 hover:opacity-100'
+                  className={`w-11 h-11 rounded-2xl object-cover cursor-pointer border-2 transition ${
+                    image === url ? 'border-indigo-500 scale-105 shadow-md shadow-indigo-500/30' : 'border-transparent opacity-60 hover:opacity-100'
                   }`}
                 />
               ))}
@@ -153,20 +153,20 @@ export const NewGroupModal = ({ isOpen, onClose, onCreateGroup }) => {
               type="url"
               value={image}
               onChange={(e) => setImage(e.target.value)}
-              placeholder="Or custom icon URL"
-              className="w-full px-3 py-1.5 bg-[#202c33] border border-transparent focus:border-[#00a884] rounded-xl text-xs text-[#e9edef] placeholder-[#8696a0] outline-none transition"
+              placeholder="Or custom icon image URL"
+              className="w-full px-4 py-2 bg-slate-900 border border-slate-750 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 rounded-2xl text-xs text-slate-100 placeholder-slate-500 outline-none transition"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-[#8696a0] uppercase tracking-wider mb-1.5">
-              Select Participants ({selectedUserIds.length} selected)
+            <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+              Select Members ({selectedUserIds.length} selected)
             </label>
-            <div className="bg-[#202c33]/40 border border-[#222e35] rounded-xl p-2 max-h-48 overflow-y-auto space-y-1">
+            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-2 max-h-48 overflow-y-auto space-y-1">
               {isLoading ? (
-                <div className="py-6 text-center text-xs text-[#8696a0]">Loading contacts...</div>
+                <div className="py-6 text-center text-xs text-slate-400">Loading contacts...</div>
               ) : users.length === 0 ? (
-                <div className="py-6 text-center text-xs text-[#8696a0]">No contacts available</div>
+                <div className="py-6 text-center text-xs text-slate-400">No contacts available</div>
               ) : (
                 users.map((u) => {
                   const isSelected = selectedUserIds.includes(u.id);
@@ -174,28 +174,28 @@ export const NewGroupModal = ({ isOpen, onClose, onCreateGroup }) => {
                     <div
                       key={u.id}
                       onClick={() => toggleUserSelection(u.id)}
-                      className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition ${
-                        isSelected ? 'bg-[#00a884]/15 text-[#e9edef]' : 'hover:bg-[#202c33] text-[#8696a0]'
+                      className={`flex items-center justify-between p-2.5 rounded-xl cursor-pointer transition ${
+                        isSelected ? 'bg-indigo-500/15 text-white border border-indigo-500/30' : 'hover:bg-slate-800/60 text-slate-400 border border-transparent'
                       }`}
                     >
-                      <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="flex items-center gap-3 min-w-0">
                         <img
                           src={u.avatarUrl || `https://api.dicebear.com/7.x/bottts/svg?seed=${u.username}`}
                           alt={u.username}
-                          className="w-8 h-8 rounded-full object-cover"
+                          className="w-8 h-8 rounded-xl object-cover bg-slate-800 border border-slate-700/60"
                         />
                         <div className="truncate">
-                          <p className="text-xs font-medium text-[#e9edef] truncate">
+                          <p className="text-xs font-semibold text-slate-100 truncate">
                             {u.displayName || u.username}
                           </p>
-                          <p className="text-[10px] text-[#8696a0]">@{u.username}</p>
+                          <p className="text-[10px] text-slate-400">@{u.username}</p>
                         </div>
                       </div>
                       <div
-                        className={`w-5 h-5 rounded-md border flex items-center justify-center transition ${
+                        className={`w-5 h-5 rounded-lg border flex items-center justify-center transition ${
                           isSelected
-                            ? 'bg-[#00a884] border-[#00a884] text-[#111b21]'
-                            : 'border-[#8696a0]/40'
+                            ? 'bg-indigo-600 border-indigo-500 text-white'
+                            : 'border-slate-700'
                         }`}
                       >
                         {isSelected && <Check className="w-3.5 h-3.5 stroke-[3]" />}
@@ -207,18 +207,18 @@ export const NewGroupModal = ({ isOpen, onClose, onCreateGroup }) => {
             </div>
           </div>
 
-          <div className="pt-2 flex justify-end gap-2">
+          <div className="pt-2 flex justify-end gap-2.5">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl text-sm text-[#8696a0] hover:text-[#e9edef] hover:bg-[#202c33] transition cursor-pointer"
+              className="px-4 py-2.5 rounded-2xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-5 py-2 bg-[#00a884] hover:bg-[#00a884]/90 disabled:opacity-50 text-[#111b21] font-semibold text-sm rounded-xl transition flex items-center gap-2 cursor-pointer shadow-md"
+              className="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 disabled:opacity-50 text-white font-bold text-xs rounded-2xl transition flex items-center gap-2 cursor-pointer shadow-lg shadow-indigo-600/30"
             >
               {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Create Group'}
             </button>

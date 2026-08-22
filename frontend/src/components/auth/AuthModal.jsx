@@ -3,7 +3,6 @@ import { useAuth } from '../../context/AuthContext';
 import { chatService } from '../../services/chatService';
 import { CameraCaptureModal } from '../media/CameraCaptureModal';
 import { 
-  MessageSquare, 
   Lock, 
   User, 
   Mail, 
@@ -150,32 +149,32 @@ export const AuthModal = () => {
   };
 
   return (
-    <div className="fixed inset-0 bg-[#0c1317] flex items-center justify-center p-4 z-50 overflow-y-auto">
-      {/* Background decoration */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-20">
-        <div className="absolute -top-40 -left-40 w-96 h-96 bg-[#00a884] rounded-full filter blur-3xl"></div>
-        <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-[#005c4b] rounded-full filter blur-3xl"></div>
+    <div className="fixed inset-0 bg-[#080b11] flex items-center justify-center p-4 z-50 overflow-y-auto chat-bg select-none">
+      {/* Ambient background glow */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-25">
+        <div className="absolute -top-40 -left-40 w-96 h-96 bg-indigo-600 rounded-full filter blur-[120px]"></div>
+        <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-violet-600 rounded-full filter blur-[120px]"></div>
       </div>
 
-      <div className="w-full max-w-md bg-[#111b21] border border-[#222e35] rounded-2xl shadow-2xl p-7 relative z-10 my-6">
+      <div className="w-full max-w-md bg-[#0f1422]/95 backdrop-blur-xl border border-slate-800 rounded-3xl shadow-2xl p-7 relative z-10 my-6 shadow-indigo-950/40">
         {/* Logo Header */}
-        <div className="text-center mb-4">
-          <div className="inline-flex items-center justify-center w-12 h-12 bg-[#00a884]/15 border border-[#00a884]/30 rounded-2xl mb-2 text-[#00a884] shadow-inner">
-            <MessageSquare className="w-6 h-6" />
+        <div className="text-center mb-5">
+          <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 rounded-2xl mb-3 text-white shadow-lg shadow-indigo-500/30 ring-4 ring-indigo-500/20">
+            <Zap className="w-7 h-7 fill-current" />
           </div>
-          <h1 className="text-2xl font-bold text-[#e9edef] tracking-tight">
-            WhatsApp Clone
+          <h1 className="text-2xl font-extrabold text-white tracking-tight">
+            Nexus Chat
           </h1>
-          <p className="text-xs text-[#8696a0] mt-0.5">
-            {isRegister ? 'Create an account to start chatting & calling' : 'Sign in to your account'}
+          <p className="text-xs text-slate-400 mt-1">
+            {isRegister ? 'Create an account to start chatting & calling' : 'Sign in to access your conversations'}
           </p>
         </div>
 
         {/* Quick Demo Login Bar */}
         {!isRegister && (
-          <div className="mb-4 bg-[#202c33]/70 border border-[#222e35] p-3 rounded-xl">
-            <div className="flex items-center gap-1.5 text-xs text-[#00a884] font-semibold mb-2">
-              <Zap className="w-3.5 h-3.5" /> Quick Demo Accounts (1-Click Login):
+          <div className="mb-5 bg-slate-900/80 border border-slate-800 p-3 rounded-2xl">
+            <div className="flex items-center gap-1.5 text-xs text-indigo-400 font-semibold mb-2">
+              <Zap className="w-3.5 h-3.5" /> 1-Click Demo Logins:
             </div>
             <div className="grid grid-cols-3 gap-2">
               {demoAccounts.map((acc) => (
@@ -183,7 +182,7 @@ export const AuthModal = () => {
                   key={acc.username}
                   type="button"
                   onClick={() => handleQuickLogin(acc.username)}
-                  className="py-1.5 px-2 bg-[#111b21] hover:bg-[#00a884]/20 hover:border-[#00a884]/40 border border-[#222e35] rounded-lg text-xs font-medium text-[#e9edef] transition cursor-pointer text-center truncate"
+                  className="py-1.5 px-2 bg-slate-800/80 hover:bg-indigo-600 hover:text-white border border-slate-700/50 rounded-xl text-xs font-semibold text-slate-200 transition cursor-pointer text-center truncate shadow-xs"
                   title={`Login as ${acc.name} (${acc.username})`}
                 >
                   {acc.name.split(' ')[0]}
@@ -194,21 +193,21 @@ export const AuthModal = () => {
         )}
 
         {error && (
-          <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-xs text-center">
+          <div className="mb-4 p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-400 text-xs text-center font-medium">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-3">
+        <form onSubmit={handleSubmit} className="space-y-3.5">
           {/* Avatar Picker at Top of Register Form */}
           {isRegister && (
-            <div className="pb-1 border-b border-[#222e35]">
+            <div className="pb-2 border-b border-slate-800">
               <div className="flex items-center justify-between mb-2">
-                <label className="text-[11px] font-medium text-[#8696a0] uppercase tracking-wider">
-                  Profile Avatar
+                <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                  Choose Avatar
                 </label>
 
-                {/* Single Add Photo Dropdown Trigger */}
+                {/* Add Photo Dropdown Trigger */}
                 <div className="relative" ref={dropdownRef}>
                   <input
                     type="file"
@@ -220,25 +219,25 @@ export const AuthModal = () => {
                   <button
                     type="button"
                     onClick={() => setIsAddPhotoDropdownOpen((prev) => !prev)}
-                    className="py-1 px-2.5 bg-[#202c33] hover:bg-[#2a3942] border border-[#374248] rounded-lg text-[#00a884] text-xs font-medium transition cursor-pointer flex items-center gap-1.5 shadow-xs"
+                    className="py-1 px-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-indigo-400 text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 shadow-xs"
                   >
                     <Plus className="w-3.5 h-3.5" />
-                    <span>Add Photo</span>
+                    <span>Upload</span>
                     <ChevronDown className={`w-3 h-3 transition-transform ${isAddPhotoDropdownOpen ? 'rotate-180' : ''}`} />
                   </button>
 
                   {/* Dropdown Menu */}
                   {isAddPhotoDropdownOpen && (
-                    <div className="absolute right-0 top-full mt-1.5 w-44 bg-[#202c33] border border-[#374248] rounded-xl shadow-xl py-1 z-30 animate-in fade-in zoom-in-95">
+                    <div className="absolute right-0 top-full mt-1.5 w-44 bg-slate-900 border border-slate-750 rounded-2xl shadow-2xl py-1.5 z-30 animate-in fade-in zoom-in-95">
                       <button
                         type="button"
                         onClick={() => {
                           setIsAddPhotoDropdownOpen(false);
                           fileInputRef.current?.click();
                         }}
-                        className="w-full px-3 py-2 text-left text-xs text-[#e9edef] hover:bg-[#111b21] flex items-center gap-2.5 transition cursor-pointer"
+                        className="w-full px-3 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 flex items-center gap-2.5 transition cursor-pointer"
                       >
-                        <ImageIcon className="w-4 h-4 text-[#00a884]" />
+                        <ImageIcon className="w-4 h-4 text-indigo-400" />
                         <span>Choose from Gallery</span>
                       </button>
                       <button
@@ -247,9 +246,9 @@ export const AuthModal = () => {
                           setIsAddPhotoDropdownOpen(false);
                           setIsCameraOpen(true);
                         }}
-                        className="w-full px-3 py-2 text-left text-xs text-[#e9edef] hover:bg-[#111b21] flex items-center gap-2.5 transition cursor-pointer"
+                        className="w-full px-3 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 flex items-center gap-2.5 transition cursor-pointer"
                       >
-                        <Camera className="w-4 h-4 text-[#00a884]" />
+                        <Camera className="w-4 h-4 text-violet-400" />
                         <span>Take with Camera</span>
                       </button>
                     </div>
@@ -257,20 +256,19 @@ export const AuthModal = () => {
                 </div>
               </div>
 
-              {/* Horizontal Avatar Presets with Adequate Padding to Prevent Cropping */}
-              <div className="py-2.5 px-1 overflow-x-auto overflow-y-visible no-scrollbar">
+              {/* Horizontal Avatar Presets */}
+              <div className="py-2 px-1 overflow-x-auto overflow-y-visible no-scrollbar">
                 <div className="flex items-center gap-2.5 min-w-max">
-                  {/* Active Custom Avatar Preview if uploaded */}
                   {!avatarIcons.some((i) => i.url === formData.avatarUrl) && formData.avatarUrl && (
                     <div className="relative group shrink-0">
-                      <div className="w-11 h-11 rounded-full border-2 border-[#00a884] overflow-hidden shadow-lg shadow-[#00a884]/30 ring-2 ring-[#00a884]/50 p-0.5 bg-[#111b21]">
+                      <div className="w-11 h-11 rounded-2xl border-2 border-indigo-500 overflow-hidden shadow-lg shadow-indigo-500/30 p-0.5 bg-slate-900">
                         <img
                           src={formData.avatarUrl}
                           alt="Custom Photo"
-                          className="w-full h-full object-cover rounded-full"
+                          className="w-full h-full object-cover rounded-xl"
                         />
                       </div>
-                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-[#00a884] text-[#111b21] rounded-full flex items-center justify-center shadow">
+                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-indigo-500 text-white rounded-full flex items-center justify-center shadow">
                         <Check className="w-2.5 h-2.5 stroke-[3]" />
                       </div>
                     </div>
@@ -283,21 +281,21 @@ export const AuthModal = () => {
                         key={idx}
                         type="button"
                         onClick={() => setFormData({ ...formData, avatarUrl: item.url })}
-                        className={`relative w-10 h-10 rounded-full shrink-0 bg-[#202c33] border-2 transition-all duration-150 transform hover:scale-110 cursor-pointer overflow-hidden p-0.5 ${
+                        className={`relative w-10 h-10 rounded-2xl shrink-0 bg-slate-800 border-2 transition-all duration-150 transform hover:scale-110 cursor-pointer overflow-hidden p-0.5 ${
                           isSelected
-                            ? 'border-[#00a884] scale-110 shadow-lg shadow-[#00a884]/30 ring-2 ring-[#00a884]/50'
-                            : 'border-transparent opacity-75 hover:opacity-100 hover:border-[#374248]'
+                            ? 'border-indigo-500 scale-110 shadow-lg shadow-indigo-500/30 ring-2 ring-indigo-500/40'
+                            : 'border-transparent opacity-75 hover:opacity-100 hover:border-slate-700'
                         }`}
                         title={item.label}
                       >
                         <img
                           src={item.url}
                           alt={item.label}
-                          className="w-full h-full object-cover rounded-full pointer-events-none"
+                          className="w-full h-full object-cover rounded-xl pointer-events-none"
                         />
                         {isSelected && (
-                          <div className="absolute inset-0 bg-[#00a884]/25 flex items-center justify-center rounded-full">
-                            <Check className="w-3.5 h-3.5 text-[#00a884] stroke-[3]" />
+                          <div className="absolute inset-0 bg-indigo-600/30 flex items-center justify-center rounded-xl">
+                            <Check className="w-3.5 h-3.5 text-indigo-400 stroke-[3]" />
                           </div>
                         )}
                       </button>
@@ -309,11 +307,11 @@ export const AuthModal = () => {
           )}
 
           <div>
-            <label className="block text-[11px] font-medium text-[#8696a0] uppercase tracking-wider mb-1">
+            <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">
               {isRegister ? 'Username' : 'Username or Email'}
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#8696a0]">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
                 <User className="w-4 h-4" />
               </div>
               <input
@@ -322,7 +320,7 @@ export const AuthModal = () => {
                 value={formData.username}
                 onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                 placeholder={isRegister ? 'e.g. alex' : 'Enter username or email'}
-                className="w-full pl-10 pr-4 py-2.5 bg-[#202c33] border border-transparent focus:border-[#00a884] rounded-xl text-[#e9edef] placeholder-[#8696a0] outline-none text-sm transition"
+                className="w-full pl-10 pr-4 py-2.5 bg-slate-900/90 border border-slate-750 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 rounded-2xl text-slate-100 placeholder-slate-500 outline-none text-sm transition"
               />
             </div>
           </div>
@@ -330,11 +328,11 @@ export const AuthModal = () => {
           {isRegister && (
             <>
               <div>
-                <label className="block text-[11px] font-medium text-[#8696a0] uppercase tracking-wider mb-1">
+                <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">
                   Display Name
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#8696a0]">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
                     <Sparkles className="w-4 h-4" />
                   </div>
                   <input
@@ -342,17 +340,17 @@ export const AuthModal = () => {
                     value={formData.displayName}
                     onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
                     placeholder="e.g. Alex Johnson"
-                    className="w-full pl-10 pr-4 py-2.5 bg-[#202c33] border border-transparent focus:border-[#00a884] rounded-xl text-[#e9edef] placeholder-[#8696a0] outline-none text-sm transition"
+                    className="w-full pl-10 pr-4 py-2.5 bg-slate-900/90 border border-slate-750 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 rounded-2xl text-slate-100 placeholder-slate-500 outline-none text-sm transition"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-[11px] font-medium text-[#8696a0] uppercase tracking-wider mb-1">
+                <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">
                   Email Address
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#8696a0]">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
                     <Mail className="w-4 h-4" />
                   </div>
                   <input
@@ -361,7 +359,7 @@ export const AuthModal = () => {
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder="alex@example.com"
-                    className="w-full pl-10 pr-4 py-2.5 bg-[#202c33] border border-transparent focus:border-[#00a884] rounded-xl text-[#e9edef] placeholder-[#8696a0] outline-none text-sm transition"
+                    className="w-full pl-10 pr-4 py-2.5 bg-slate-900/90 border border-slate-750 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 rounded-2xl text-slate-100 placeholder-slate-500 outline-none text-sm transition"
                   />
                 </div>
               </div>
@@ -369,11 +367,11 @@ export const AuthModal = () => {
           )}
 
           <div>
-            <label className="block text-[11px] font-medium text-[#8696a0] uppercase tracking-wider mb-1">
+            <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">
               Password
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#8696a0]">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
                 <Lock className="w-4 h-4" />
               </div>
               <input
@@ -382,7 +380,7 @@ export const AuthModal = () => {
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 placeholder="••••••••"
-                className="w-full pl-10 pr-4 py-2.5 bg-[#202c33] border border-transparent focus:border-[#00a884] rounded-xl text-[#e9edef] placeholder-[#8696a0] outline-none text-sm transition"
+                className="w-full pl-10 pr-4 py-2.5 bg-slate-900/90 border border-slate-750 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 rounded-2xl text-slate-100 placeholder-slate-500 outline-none text-sm transition"
               />
             </div>
           </div>
@@ -390,7 +388,7 @@ export const AuthModal = () => {
           <button
             type="submit"
             disabled={isLoading || isUploadingAvatar}
-            className="w-full mt-2 py-2.5 px-4 bg-[#00a884] hover:bg-[#00a884]/90 disabled:opacity-50 text-[#111b21] font-semibold rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-[#00a884]/20 cursor-pointer text-sm"
+            className="w-full mt-2 py-3 px-4 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 disabled:opacity-50 text-white font-bold rounded-2xl transition flex items-center justify-center gap-2 shadow-xl shadow-indigo-600/30 hover:scale-102 active:scale-98 cursor-pointer text-sm"
           >
             {isLoading || isUploadingAvatar ? (
               <Loader2 className="w-5 h-5 animate-spin" />
@@ -404,14 +402,14 @@ export const AuthModal = () => {
         </form>
 
         {/* Toggle between Login and Register */}
-        <div className="mt-4 text-center text-xs text-[#8696a0]">
+        <div className="mt-5 text-center text-xs text-slate-400">
           {isRegister ? (
             <p>
               Already have an account?{' '}
               <button
                 type="button"
                 onClick={() => { setIsRegister(false); setError(''); }}
-                className="text-[#00a884] hover:underline font-medium cursor-pointer"
+                className="text-indigo-400 hover:text-indigo-300 hover:underline font-bold cursor-pointer"
               >
                 Sign In
               </button>
@@ -422,7 +420,7 @@ export const AuthModal = () => {
               <button
                 type="button"
                 onClick={() => { setIsRegister(true); setError(''); }}
-                className="text-[#00a884] hover:underline font-medium cursor-pointer"
+                className="text-indigo-400 hover:text-indigo-300 hover:underline font-bold cursor-pointer"
               >
                 Create one now
               </button>

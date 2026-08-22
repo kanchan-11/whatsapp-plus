@@ -1,11 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import EmojiPicker, { Theme } from 'emoji-picker-react';
 import { 
   Smile, 
   Paperclip, 
   Send, 
   Mic, 
-  Square, 
   Image as ImageIcon, 
   Video as VideoIcon, 
   FileText, 
@@ -167,11 +166,11 @@ export const MessageInput = ({ onSendMessage, onTyping }) => {
   };
 
   return (
-    <div className="bg-[#202c33] px-4 py-2.5 relative border-t border-[#222e35]">
+    <div className="bg-[#0f1422] px-5 py-3 relative border-t border-slate-800/80">
       {/* File Preview before sending */}
       {previewAttachment && (
-        <div className="mb-3 p-3 bg-[#111b21] rounded-2xl border border-[#222e35] flex items-center justify-between">
-          <div className="flex items-center gap-3 min-w-0">
+        <div className="mb-3 p-3 bg-slate-900/90 rounded-2xl border border-slate-800 flex items-center justify-between shadow-lg">
+          <div className="flex items-center gap-3.5 min-w-0">
             {previewAttachment.fileType?.startsWith('image/') ? (
               <img
                 src={previewAttachment.fileUrl}
@@ -179,24 +178,24 @@ export const MessageInput = ({ onSendMessage, onTyping }) => {
                 className="w-14 h-14 object-cover rounded-xl border border-white/10"
               />
             ) : previewAttachment.fileType?.startsWith('video/') ? (
-              <div className="w-14 h-14 bg-black/40 rounded-xl flex items-center justify-center text-[#00a884]">
+              <div className="w-14 h-14 bg-violet-500/20 rounded-xl flex items-center justify-center text-violet-400">
                 <VideoIcon className="w-6 h-6" />
               </div>
             ) : (
-              <div className="w-14 h-14 bg-[#00a884]/20 rounded-xl flex items-center justify-center text-[#00a884]">
+              <div className="w-14 h-14 bg-indigo-500/20 rounded-xl flex items-center justify-center text-indigo-400">
                 <FileText className="w-6 h-6" />
               </div>
             )}
             <div className="truncate">
-              <p className="text-xs font-semibold text-[#e9edef] truncate">
+              <p className="text-xs font-semibold text-slate-100 truncate">
                 {previewAttachment.fileName}
               </p>
-              <p className="text-[11px] text-[#8696a0]">Ready to send • Add a caption below</p>
+              <p className="text-[11px] text-slate-400">Ready to send • Add a caption below</p>
             </div>
           </div>
           <button
             onClick={() => setPreviewAttachment(null)}
-            className="p-1.5 rounded-full hover:bg-white/10 text-[#8696a0] hover:text-[#e9edef] transition cursor-pointer"
+            className="p-1.5 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-slate-100 transition cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -205,23 +204,23 @@ export const MessageInput = ({ onSendMessage, onTyping }) => {
 
       {/* Emoji Picker Popup */}
       {showEmojiPicker && (
-        <div className="absolute bottom-16 left-4 z-50 shadow-2xl rounded-2xl overflow-hidden border border-[#222e35]">
+        <div className="absolute bottom-18 left-5 z-50 shadow-2xl rounded-2xl overflow-hidden border border-slate-800">
           <EmojiPicker
             theme={Theme.DARK}
             onEmojiClick={handleEmojiClick}
             lazyLoadEmojis={true}
             searchDisabled={false}
             width={340}
-            height={400}
+            height={390}
           />
         </div>
       )}
 
       {/* Attachment Menu Popup */}
       {showAttachMenu && (
-        <div className="absolute bottom-16 left-12 bg-[#202c33] border border-[#222e35] rounded-2xl p-2 shadow-2xl flex flex-col gap-1 z-50 animate-in fade-in slide-in-from-bottom-2">
-          <label className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#111b21] cursor-pointer transition text-[#e9edef] text-xs font-medium">
-            <ImageIcon className="w-4 h-4 text-[#00a884]" />
+        <div className="absolute bottom-18 left-14 bg-slate-900 border border-slate-800 rounded-2xl p-2 shadow-2xl flex flex-col gap-1 z-50 animate-in fade-in slide-in-from-bottom-2">
+          <label className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-slate-800 cursor-pointer transition text-slate-200 text-xs font-medium">
+            <ImageIcon className="w-4 h-4 text-indigo-400" />
             Photos & Videos
             <input
               type="file"
@@ -230,8 +229,8 @@ export const MessageInput = ({ onSendMessage, onTyping }) => {
               onChange={handleFileSelect}
             />
           </label>
-          <label className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#111b21] cursor-pointer transition text-[#e9edef] text-xs font-medium">
-            <FileText className="w-4 h-4 text-[#53bdeb]" />
+          <label className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-slate-800 cursor-pointer transition text-slate-200 text-xs font-medium">
+            <FileText className="w-4 h-4 text-cyan-400" />
             Document
             <input
               type="file"
@@ -244,10 +243,10 @@ export const MessageInput = ({ onSendMessage, onTyping }) => {
 
       {/* Voice Recording Bar */}
       {isRecording ? (
-        <div className="flex items-center justify-between px-3 py-1 bg-[#111b21] rounded-2xl border border-[#222e35]">
+        <div className="flex items-center justify-between px-4 py-2 bg-slate-900/95 rounded-2xl border border-rose-500/30 shadow-lg shadow-rose-950/20">
           <div className="flex items-center gap-3">
-            <span className="w-3 h-3 bg-red-500 rounded-full animate-ping"></span>
-            <span className="text-xs text-red-400 font-medium">
+            <span className="w-3 h-3 bg-rose-500 rounded-full animate-ping"></span>
+            <span className="text-xs text-rose-400 font-semibold">
               Recording audio: {Math.floor(recordingDuration / 60)}:
               {('0' + (recordingDuration % 60)).slice(-2)}
             </span>
@@ -255,13 +254,13 @@ export const MessageInput = ({ onSendMessage, onTyping }) => {
           <div className="flex items-center gap-2">
             <button
               onClick={cancelRecording}
-              className="px-3 py-1.5 text-xs text-[#8696a0] hover:text-[#e9edef] transition cursor-pointer"
+              className="px-3.5 py-1.5 text-xs font-semibold text-slate-400 hover:text-white transition cursor-pointer"
             >
               Cancel
             </button>
             <button
               onClick={stopRecording}
-              className="p-2 bg-[#00a884] hover:bg-[#00a884]/90 text-[#111b21] rounded-full transition cursor-pointer"
+              className="p-2 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white rounded-xl transition cursor-pointer shadow-md"
             >
               <Send className="w-4 h-4" />
             </button>
@@ -269,7 +268,7 @@ export const MessageInput = ({ onSendMessage, onTyping }) => {
         </div>
       ) : (
         /* Regular Input Bar */
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           {/* Emoji toggle */}
           <button
             type="button"
@@ -277,11 +276,11 @@ export const MessageInput = ({ onSendMessage, onTyping }) => {
               setShowEmojiPicker(!showEmojiPicker);
               setShowAttachMenu(false);
             }}
-            className={`p-2 rounded-full transition cursor-pointer ${
-              showEmojiPicker ? 'text-[#00a884] bg-[#111b21]' : 'text-[#8696a0] hover:text-[#e9edef]'
+            className={`p-2.5 rounded-xl transition cursor-pointer ${
+              showEmojiPicker ? 'text-indigo-400 bg-slate-800' : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/60'
             }`}
           >
-            <Smile className="w-6 h-6" />
+            <Smile className="w-5 h-5" />
           </button>
 
           {/* Attachment toggle */}
@@ -291,22 +290,22 @@ export const MessageInput = ({ onSendMessage, onTyping }) => {
               setShowAttachMenu(!showAttachMenu);
               setShowEmojiPicker(false);
             }}
-            className={`p-2 rounded-full transition cursor-pointer ${
-              showAttachMenu ? 'text-[#00a884] bg-[#111b21]' : 'text-[#8696a0] hover:text-[#e9edef]'
+            className={`p-2.5 rounded-xl transition cursor-pointer ${
+              showAttachMenu ? 'text-indigo-400 bg-slate-800' : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/60'
             }`}
           >
             <Paperclip className="w-5 h-5" />
           </button>
 
           {/* Input field */}
-          <div className="flex-1 bg-[#2a3942] rounded-xl px-4 py-2 focus-within:ring-1 focus-within:ring-[#00a884]">
+          <div className="flex-1 bg-slate-900/90 border border-slate-750 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 rounded-2xl px-4 py-2.5 transition">
             <input
               type="text"
               value={text}
               onChange={handleTextChange}
               onKeyDown={handleKeyDown}
-              placeholder={previewAttachment ? 'Add a caption...' : 'Type a message'}
-              className="w-full bg-transparent text-sm text-[#e9edef] placeholder-[#8696a0] outline-none"
+              placeholder={previewAttachment ? 'Add a caption...' : 'Type a message...'}
+              className="w-full bg-transparent text-sm text-slate-100 placeholder-slate-500 outline-none"
             />
           </div>
 
@@ -315,19 +314,19 @@ export const MessageInput = ({ onSendMessage, onTyping }) => {
             <button
               onClick={handleSend}
               disabled={isUploading}
-              className="p-2.5 bg-[#00a884] hover:bg-[#00a884]/90 disabled:opacity-50 text-[#111b21] rounded-full transition shadow-md cursor-pointer flex items-center justify-center"
+              className="p-3 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 disabled:opacity-50 text-white rounded-2xl transition shadow-lg shadow-indigo-600/30 cursor-pointer flex items-center justify-center"
             >
               {isUploading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
+                <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
-                <Send className="w-5 h-5 ml-0.5" />
+                <Send className="w-4 h-4 ml-0.5" />
               )}
             </button>
           ) : (
             <button
               onClick={startRecording}
               title="Record voice note"
-              className="p-2.5 rounded-full text-[#8696a0] hover:text-[#e9edef] hover:bg-[#374248] transition cursor-pointer"
+              className="p-2.5 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-slate-800/60 transition cursor-pointer"
             >
               <Mic className="w-5 h-5" />
             </button>

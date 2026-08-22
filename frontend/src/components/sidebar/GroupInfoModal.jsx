@@ -30,7 +30,7 @@ export const GroupInfoModal = ({ isOpen, onClose, chat, onGroupUpdated }) => {
   };
 
   const handleRemoveMember = async (targetUserId) => {
-    if (!confirm('Are you sure you want to remove this participant?')) return;
+    if (!confirm('Are you sure you want to remove this member?')) return;
     setIsLoading(true);
     try {
       const updated = await chatService.updateGroupChat(chat.id, {
@@ -62,36 +62,36 @@ export const GroupInfoModal = ({ isOpen, onClose, chat, onGroupUpdated }) => {
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-        <div className="w-full max-w-md bg-[#111b21] border border-[#222e35] rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+      <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in select-none">
+        <div className="w-full max-w-md bg-[#0f1422] border border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] shadow-indigo-950/40">
           {/* Header */}
-          <div className="px-5 py-4 bg-[#202c33] flex items-center justify-between border-b border-[#222e35]">
-            <h2 className="text-lg font-semibold text-[#e9edef] flex items-center gap-2">
-              <Users className="w-5 h-5 text-[#00a884]" />
-              Group Info
+          <div className="px-6 py-4 bg-slate-900/80 flex items-center justify-between border-b border-slate-800">
+            <h2 className="text-base font-bold text-white flex items-center gap-2">
+              <Users className="w-5 h-5 text-indigo-400" />
+              Group Details
             </h2>
             <button
               onClick={onClose}
-              className="p-1 rounded-lg text-[#8696a0] hover:text-[#e9edef] hover:bg-[#111b21]/50 transition cursor-pointer"
+              className="p-1 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-5 space-y-5">
+          <div className="flex-1 overflow-y-auto p-6 space-y-5">
             {/* Group Banner */}
             <div className="flex flex-col items-center text-center">
               <img
                 src={chat.image || 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=150&auto=format&fit=crop&q=80'}
                 alt={chat.name}
-                className="w-20 h-20 rounded-2xl object-cover border-2 border-[#202c33] shadow-md mb-3"
+                className="w-20 h-20 rounded-3xl object-cover border-2 border-slate-750 shadow-xl mb-3 ring-2 ring-indigo-500/20"
               />
-              <h3 className="text-lg font-bold text-[#e9edef]">{chat.name}</h3>
-              <p className="text-xs text-[#8696a0] mt-0.5">
+              <h3 className="text-lg font-extrabold text-white">{chat.name}</h3>
+              <p className="text-xs text-slate-400 mt-0.5 font-medium">
                 Group • {chat.members?.length || 0} participants
               </p>
               {chat.description && (
-                <p className="text-xs text-[#8696a0] mt-2 italic bg-[#202c33]/40 p-2.5 rounded-xl w-full">
+                <p className="text-xs text-slate-300 mt-3 italic bg-slate-900/70 border border-slate-800 p-3 rounded-2xl w-full leading-relaxed">
                   "{chat.description}"
                 </p>
               )}
@@ -101,48 +101,48 @@ export const GroupInfoModal = ({ isOpen, onClose, chat, onGroupUpdated }) => {
             {isAdmin && (
               <button
                 onClick={() => setIsAddingMember(true)}
-                className="w-full py-2.5 px-3 bg-[#202c33] hover:bg-[#2a3942] text-[#00a884] rounded-xl flex items-center justify-center gap-2 text-xs font-semibold transition cursor-pointer"
+                className="w-full py-2.5 px-4 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white rounded-2xl flex items-center justify-center gap-2 text-xs font-bold transition cursor-pointer shadow-md shadow-indigo-600/30"
               >
                 <UserPlus className="w-4 h-4" />
-                Add Participants
+                Add Members
               </button>
             )}
 
             {/* Participants list */}
             <div>
-              <h4 className="text-xs font-semibold text-[#8696a0] uppercase tracking-wider mb-2">
+              <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
                 Participants
               </h4>
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 {chat.members?.map((member) => (
                   <div
                     key={member.id}
-                    className="flex items-center justify-between p-2.5 rounded-xl hover:bg-[#202c33] transition"
+                    className="flex items-center justify-between p-2.5 rounded-2xl hover:bg-slate-800/60 transition border border-transparent hover:border-slate-750"
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       <img
                         src={member.user?.avatarUrl || `https://api.dicebear.com/7.x/bottts/svg?seed=${member.user?.username}`}
                         alt={member.user?.username}
-                        className="w-9 h-9 rounded-full object-cover"
+                        className="w-9 h-9 rounded-xl object-cover bg-slate-800 border border-slate-700/60"
                       />
                       <div className="truncate">
-                        <p className="text-xs font-medium text-[#e9edef] truncate flex items-center gap-1.5">
+                        <p className="text-xs font-semibold text-slate-100 truncate flex items-center gap-1.5">
                           {member.user?.id === user?.id ? 'You' : member.user?.displayName || member.user?.username}
                         </p>
-                        <p className="text-[10px] text-[#8696a0]">@{member.user?.username}</p>
+                        <p className="text-[10px] text-slate-400">@{member.user?.username}</p>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-2">
                       {member.role === 'ADMIN' && (
-                        <span className="text-[10px] px-2 py-0.5 bg-[#00a884]/15 text-[#00a884] rounded-md font-medium border border-[#00a884]/30 flex items-center gap-1">
+                        <span className="text-[10px] px-2 py-0.5 bg-indigo-500/15 text-indigo-300 rounded-lg font-bold border border-indigo-500/30 flex items-center gap-1">
                           <Shield className="w-2.5 h-2.5" /> Admin
                         </span>
                       )}
                       {isAdmin && member.user?.id !== user?.id && (
                         <button
                           onClick={() => handleRemoveMember(member.user?.id)}
-                          className="text-[11px] text-red-400 hover:text-red-300 hover:underline p-1 cursor-pointer"
+                          className="text-[11px] text-rose-400 hover:text-rose-300 hover:underline p-1 cursor-pointer font-medium"
                         >
                           Remove
                         </button>
@@ -158,7 +158,7 @@ export const GroupInfoModal = ({ isOpen, onClose, chat, onGroupUpdated }) => {
               <button
                 onClick={handleLeaveGroup}
                 disabled={isLoading}
-                className="w-full py-2.5 px-4 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition cursor-pointer"
+                className="w-full py-2.5 px-4 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 transition cursor-pointer"
               >
                 <LogOut className="w-4 h-4" />
                 Exit Group

@@ -14,7 +14,7 @@ import { CallOverlay } from './components/call/CallOverlay';
 import { chatService } from './services/chatService';
 import { callService } from './services/callService';
 import { soundService } from './services/soundService';
-import { Loader2, LogOut } from 'lucide-react';
+import { Loader2, LogOut, Zap } from 'lucide-react';
 
 const MainLayout = () => {
   const { user, logout, isAuthenticated, isLoading: authLoading } = useAuth();
@@ -174,7 +174,7 @@ const MainLayout = () => {
 
   if (authLoading) {
     return (
-      <div className="h-screen w-screen bg-[#111b21] flex items-center justify-center text-[#00a884]">
+      <div className="h-screen w-screen bg-[#080b11] flex items-center justify-center text-indigo-400">
         <Loader2 className="w-10 h-10 animate-spin" />
       </div>
     );
@@ -187,9 +187,9 @@ const MainLayout = () => {
   const selectedChat = chats.find((c) => c.id === selectedChatId) || null;
 
   return (
-    <div className="h-screen w-screen bg-[#0c1317] flex items-center justify-center overflow-hidden">
-      {/* WhatsApp Main App Container */}
-      <div className="w-full h-full max-w-[1800px] max-h-[1050px] flex overflow-hidden shadow-2xl bg-[#111b21]">
+    <div className="h-screen w-screen bg-[#070a10] flex items-center justify-center overflow-hidden">
+      {/* App Container */}
+      <div className="w-full h-full max-w-[1850px] max-h-[1080px] flex overflow-hidden shadow-2xl bg-[#0a0e17] border border-slate-800/60 rounded-none sm:rounded-3xl">
         {/* Dock Navigation Rail (Chats, Calls, Settings, Profile, Logout) */}
         <NavigationRail
           activeTab={activeTab}
@@ -243,24 +243,24 @@ const MainLayout = () => {
 
       {/* Logout Confirmation Popup Modal */}
       {isLogoutConfirmOpen && (
-        <div className="fixed inset-0 bg-black/75 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in">
-          <div className="w-full max-w-sm bg-[#111b21] border border-[#222e35] rounded-2xl shadow-2xl overflow-hidden flex flex-col p-6 animate-in zoom-in-95">
-            <div className="w-12 h-12 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 flex items-center justify-center mx-auto mb-4">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in select-none">
+          <div className="w-full max-w-sm bg-[#0f1422] border border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col p-6 animate-in zoom-in-95 shadow-rose-950/20">
+            <div className="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center mx-auto mb-4">
               <LogOut className="w-6 h-6" />
             </div>
 
-            <h3 className="text-base font-semibold text-[#e9edef] text-center mb-1.5">
-              Log out of WhatsApp?
+            <h3 className="text-lg font-bold text-white text-center mb-1.5">
+              Sign out of Nexus?
             </h3>
-            <p className="text-xs text-[#8696a0] text-center mb-6 leading-relaxed">
-              Are you sure you want to log out? You will need to log in again to access your messages and calls.
+            <p className="text-xs text-slate-400 text-center mb-6 leading-relaxed">
+              Are you sure you want to sign out? You will need to sign in again to access your chats and calls.
             </p>
 
             <div className="flex items-center gap-3">
               <button
                 type="button"
                 onClick={() => setIsLogoutConfirmOpen(false)}
-                className="flex-1 py-2.5 px-4 bg-[#202c33] hover:bg-[#374248] text-[#e9edef] text-xs font-semibold rounded-xl transition cursor-pointer border border-[#374248]"
+                className="flex-1 py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl transition cursor-pointer border border-slate-700"
               >
                 Cancel
               </button>
@@ -270,10 +270,10 @@ const MainLayout = () => {
                   setIsLogoutConfirmOpen(false);
                   logout();
                 }}
-                className="flex-1 py-2.5 px-4 bg-red-600 hover:bg-red-500 text-white text-xs font-semibold rounded-xl transition cursor-pointer shadow-lg shadow-red-600/30 flex items-center justify-center gap-1.5"
+                className="flex-1 py-2.5 px-4 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-xl transition cursor-pointer shadow-lg shadow-rose-600/30 flex items-center justify-center gap-1.5"
               >
                 <LogOut className="w-3.5 h-3.5" />
-                <span>Log out</span>
+                <span>Sign out</span>
               </button>
             </div>
           </div>
