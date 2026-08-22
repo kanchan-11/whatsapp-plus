@@ -10,12 +10,8 @@ RUN mvn clean package -DskipTests -B
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
-# Add non-root user for security
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-USER appuser
-
-VOLUME /app/data
-VOLUME /app/uploads
+# Create persistent folders
+RUN mkdir -p /app/data /app/uploads
 
 COPY --from=build /app/target/*.jar app.jar
 
