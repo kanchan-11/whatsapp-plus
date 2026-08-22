@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Phone, Video, Lock, Plus, Users, ShieldCheck, Zap } from 'lucide-react';
+import { Phone, Video, Lock, Plus, Users, ShieldCheck } from 'lucide-react';
 import { NewChatModal } from '../sidebar/NewChatModal';
+import { InstantPingLogo } from '../common/InstantPingLogo';
 import { useCall } from '../../context/CallContext';
 
 export const CallsSplash = () => {
@@ -10,13 +11,13 @@ export const CallsSplash = () => {
   return (
     <div className="hidden md:flex flex-1 flex-col items-center justify-center bg-[#0a0e17] chat-bg p-8 text-center select-none relative">
       <div className="max-w-md flex flex-col items-center">
-        {/* Calling Icon */}
-        <div className="w-20 h-20 bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 rounded-3xl flex items-center justify-center mb-6 shadow-2xl shadow-indigo-500/30 text-white ring-4 ring-indigo-500/20">
-          <Phone className="w-9 h-9" />
+        {/* Calling Brand Icon */}
+        <div className="mb-6">
+          <InstantPingLogo className="w-20 h-20 shadow-2xl shadow-indigo-500/40" />
         </div>
 
         <h1 className="text-3xl font-extrabold text-white mb-3 tracking-tight">
-          Audio & Video Calls
+          InstantPing Voice & Video
         </h1>
 
         <p className="text-sm text-slate-400 leading-relaxed mb-8">

@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { chatService } from '../../services/chatService';
 import { CameraCaptureModal } from '../media/CameraCaptureModal';
+import { InstantPingLogo } from '../common/InstantPingLogo';
 import { 
   Lock, 
   User, 
@@ -158,12 +159,12 @@ export const AuthModal = () => {
 
       <div className="w-full max-w-md bg-[#0f1422]/95 backdrop-blur-xl border border-slate-800 rounded-3xl shadow-2xl p-7 relative z-10 my-6 shadow-indigo-950/40">
         {/* Logo Header */}
-        <div className="text-center mb-5">
-          <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 rounded-2xl mb-3 text-white shadow-lg shadow-indigo-500/30 ring-4 ring-indigo-500/20">
-            <Zap className="w-7 h-7 fill-current" />
+        <div className="text-center mb-5 flex flex-col items-center">
+          <div className="mb-3">
+            <InstantPingLogo className="w-14 h-14 shadow-xl shadow-indigo-500/30" />
           </div>
           <h1 className="text-2xl font-extrabold text-white tracking-tight">
-            Nexus Chat
+            InstantPing
           </h1>
           <p className="text-xs text-slate-400 mt-1">
             {isRegister ? 'Create an account to start chatting & calling' : 'Sign in to access your conversations'}
@@ -182,7 +183,7 @@ export const AuthModal = () => {
                   key={acc.username}
                   type="button"
                   onClick={() => handleQuickLogin(acc.username)}
-                  className="py-1.5 px-2 bg-slate-800/80 hover:bg-indigo-600 hover:text-white border border-slate-700/50 rounded-xl text-xs font-semibold text-slate-200 transition cursor-pointer text-center truncate shadow-xs"
+                  className="py-1.5 px-2 bg-slate-800/80 hover:bg-indigo-600 hover:text-white border border-slate-750 rounded-xl text-xs font-semibold text-slate-200 transition cursor-pointer text-center truncate shadow-xs"
                   title={`Login as ${acc.name} (${acc.username})`}
                 >
                   {acc.name.split(' ')[0]}

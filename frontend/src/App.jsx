@@ -250,7 +250,7 @@ const MainLayout = () => {
             </div>
 
             <h3 className="text-lg font-bold text-white text-center mb-1.5">
-              Sign out of Nexus?
+              Sign out of InstantPing?
             </h3>
             <p className="text-xs text-slate-400 text-center mb-6 leading-relaxed">
               Are you sure you want to sign out? You will need to sign in again to access your chats and calls.

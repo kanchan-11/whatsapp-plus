@@ -1,12 +1,11 @@
 import React from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { InstantPingLogo } from '../common/InstantPingLogo';
 import { 
   MessageSquare, 
   Phone, 
   Settings, 
-  LogOut, 
-  Sparkles,
-  Zap
+  LogOut
 } from 'lucide-react';
 
 export const NavigationRail = ({
@@ -23,9 +22,9 @@ export const NavigationRail = ({
     <aside className="w-18 bg-[#0c101a] border-r border-slate-800/70 flex flex-col items-center justify-between py-5 select-none shrink-0 z-20 shadow-2xl">
       {/* Top App Logo & Navigation Items */}
       <div className="flex flex-col items-center gap-6 w-full">
-        {/* Brand App Icon */}
-        <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30 ring-2 ring-indigo-400/20">
-          <Zap className="w-5 h-5 fill-current" />
+        {/* InstantPing Brand Logo */}
+        <div className="relative group cursor-pointer" title="InstantPing">
+          <InstantPingLogo className="w-10 h-10 shadow-lg shadow-indigo-500/30 transition-transform duration-200 group-hover:scale-105" />
         </div>
 
         <div className="w-8 h-[1px] bg-slate-800/80 my-1"></div>

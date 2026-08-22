@@ -9,6 +9,7 @@ import { MessageList } from './MessageList';
 import { MessageInput } from './MessageInput';
 import { MediaLightbox } from '../media/MediaLightbox';
 import { GroupInfoModal } from '../sidebar/GroupInfoModal';
+import { InstantPingLogo } from '../common/InstantPingLogo';
 import { Lock, MessageSquare, PhoneCall, Radio, Video, Zap, ShieldCheck } from 'lucide-react';
 
 export const ChatArea = ({
@@ -152,14 +153,14 @@ export const ChatArea = ({
     return (
       <div className="hidden md:flex flex-1 flex-col items-center justify-center bg-[#0a0e17] chat-bg p-8 text-center select-none relative">
         <div className="max-w-md flex flex-col items-center">
-          <div className="w-20 h-20 bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 rounded-3xl flex items-center justify-center mb-6 shadow-2xl shadow-indigo-500/30 text-white ring-4 ring-indigo-500/20">
-            <Zap className="w-10 h-10 fill-current" />
+          <div className="mb-6">
+            <InstantPingLogo className="w-20 h-20 shadow-2xl shadow-indigo-500/40" />
           </div>
           <h1 className="text-3xl font-extrabold text-white mb-3 tracking-tight">
-            Welcome to Nexus Chat
+            Welcome to InstantPing
           </h1>
           <p className="text-sm text-slate-400 leading-relaxed mb-8">
-            Experience ultra-fast real-time messaging, multi-user HD voice and video rooms, media sharing, and end-to-end encryption.
+            Ultra-fast real-time messaging, multi-user HD voice and video rooms, voice notes, and end-to-end encrypted conversations.
           </p>
 
           <div className="flex items-center gap-2 text-xs text-slate-300 bg-slate-900/80 px-4 py-2.5 rounded-full border border-slate-800 shadow-sm">
