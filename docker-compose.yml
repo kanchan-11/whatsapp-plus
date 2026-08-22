@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: instantping-backend
+    restart: always
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    volumes:
+      - app-data:/app/data
+      - app-uploads:/app/uploads
+    networks:
+      - instantping-net
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/api/auth/login || exit 0"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: instantping-frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - instantping-net
+
+networks:
+  instantping-net:
+    driver: bridge
+
+volumes:
+  app-data:
+  app-uploads:
