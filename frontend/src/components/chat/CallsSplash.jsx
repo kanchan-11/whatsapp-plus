@@ -13,7 +13,7 @@ export const CallsSplash = () => {
       <div className="max-w-md flex flex-col items-center">
         {/* Calling Brand Icon */}
         <div className="mb-6">
-          <InstantPingLogo className="w-20 h-20 shadow-2xl shadow-indigo-500/40" />
+          <InstantPingLogo className="w-20 h-20" />
         </div>
 
         <h1 className="text-3xl font-extrabold text-white mb-3 tracking-tight">

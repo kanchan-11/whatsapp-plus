@@ -161,7 +161,7 @@ export const AuthModal = () => {
         {/* Logo Header */}
         <div className="text-center mb-5 flex flex-col items-center">
           <div className="mb-3">
-            <InstantPingLogo className="w-14 h-14 shadow-xl shadow-indigo-500/30" />
+            <InstantPingLogo className="w-14 h-14" />
           </div>
           <h1 className="text-2xl font-extrabold text-white tracking-tight">
             InstantPing

@@ -6,7 +6,8 @@ export const InstantPingLogo = ({ className = 'w-10 h-10' }) => {
       viewBox="0 0 128 128"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className={`${className} overflow-visible`}
+      className={className}
+      style={{ overflow: 'visible' }}
     >
       <defs>
         {/* Rich Brand Gradient */}
@@ -22,13 +23,18 @@ export const InstantPingLogo = ({ className = 'w-10 h-10' }) => {
           <stop offset="100%" stopColor="#7c3aed" />
         </linearGradient>
 
-        {/* Soft Inner Shadow / Glow Filter */}
+        {/* Squircle Soft Glow Filter following exact rounded shape */}
+        <filter id="squircleShadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="8" stdDeviation="12" floodColor="#6366f1" floodOpacity="0.35" />
+        </filter>
+
+        {/* Soft Inner Shadow Filter for chat bubble */}
         <filter id="subtleGlow" x="-10%" y="-10%" width="120%" height="120%">
-          <feDropShadow dx="0" dy="2" stdDeviation="3" floodColor="#000000" floodOpacity="0.25" />
+          <feDropShadow dx="0" dy="2" stdDeviation="3" floodColor="#000000" floodOpacity="0.2" />
         </filter>
       </defs>
 
-      {/* Pristine Squircle Badge with smooth radius and inset margin */}
+      {/* Pristine Squircle Badge with smooth radius and curved glow */}
       <rect
         x="6"
         y="6"
@@ -37,6 +43,7 @@ export const InstantPingLogo = ({ className = 'w-10 h-10' }) => {
         rx="28"
         ry="28"
         fill="url(#ipBgGradient)"
+        filter="url(#squircleShadow)"
       />
 
       {/* Subtle Inner Bevel Highlight */}

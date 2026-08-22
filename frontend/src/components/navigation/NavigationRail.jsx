@@ -24,7 +24,7 @@ export const NavigationRail = ({
       <div className="flex flex-col items-center gap-6 w-full">
         {/* InstantPing Brand Logo */}
         <div className="relative group cursor-pointer" title="InstantPing">
-          <InstantPingLogo className="w-10 h-10 shadow-lg shadow-indigo-500/30 transition-transform duration-200 group-hover:scale-105" />
+          <InstantPingLogo className="w-10 h-10 transition-transform duration-200 group-hover:scale-105" />
         </div>
 
         <div className="w-8 h-[1px] bg-slate-800/80 my-1"></div>
