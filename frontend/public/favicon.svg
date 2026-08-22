@@ -1,36 +1,24 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
+<svg viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="favBgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#6366f1" />
       <stop offset="50%" stop-color="#4f46e5" />
-      <stop offset="100%" stop-color="#9333ea" />
+      <stop offset="100%" stop-color="#8b5cf6" />
     </linearGradient>
-    <linearGradient id="glowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#38bdf8" />
-      <stop offset="100%" stop-color="#818cf8" />
+    <linearGradient id="favBoltGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366f1" />
+      <stop offset="100%" stop-color="#7c3aed" />
     </linearGradient>
-    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="3" result="blur" />
-      <feComposite in="SourceGraphic" in2="blur" operator="over" />
-    </filter>
   </defs>
 
-  <!-- App Squircle Background -->
-  <rect width="128" height="128" rx="36" fill="url(#bgGrad)" />
-  <rect width="124" height="124" x="2" y="2" rx="34" stroke="rgba(255, 255, 255, 0.2)" stroke-width="2" />
+  <rect x="6" y="6" width="116" height="116" rx="28" ry="28" fill="url(#favBgGrad)" />
+  <rect x="7.5" y="7.5" width="113" height="113" rx="26.5" ry="26.5" stroke="rgba(255, 255, 255, 0.25)" stroke-width="2" fill="none" />
 
-  <!-- Outer Ping Wave -->
-  <path d="M78 30 C96 36, 106 52, 102 72" stroke="rgba(255, 255, 255, 0.4)" stroke-width="5" stroke-linecap="round" fill="none" />
-  
-  <!-- Middle Ping Wave -->
-  <path d="M70 40 C82 45, 88 56, 85 70" stroke="rgba(255, 255, 255, 0.7)" stroke-width="5" stroke-linecap="round" fill="none" />
+  <path d="M78 28 C96 34, 105 50, 100 70" stroke="rgba(255, 255, 255, 0.45)" stroke-width="5" stroke-linecap="round" fill="none" />
+  <path d="M72 38 C84 43, 89 54, 86 67" stroke="rgba(255, 255, 255, 0.75)" stroke-width="4.5" stroke-linecap="round" fill="none" />
 
-  <!-- Main Message / Ping Shape -->
-  <path d="M34 36 C34 29.37 39.37 24 46 24 H64 C70.63 24 76 29.37 76 36 V62 C76 68.63 70.63 74 64 74 H48 L34 86 V36 Z" fill="white" filter="url(#glow)" />
+  <path d="M34 36 C34 28.5 40 22.5 47.5 22.5 H65.5 C73 22.5 79 28.5 79 36 V60 C79 67.5 73 73.5 65.5 73.5 H50 L37 84 C35.2 85.4 34 84.4 34 82.5 V36 Z" fill="#FFFFFF" />
+  <path d="M58.5 32 L45 52 H55.5 L52.5 67 L67.5 45.5 H56.5 L58.5 32 Z" fill="url(#favBoltGrad)" stroke="#4f46e5" stroke-width="1.2" stroke-linejoin="round" />
 
-  <!-- Electric Instant Ping Bolt inside bubble -->
-  <path d="M57 32 L44 52 H54 L51 68 L66 46 H56 L57 32 Z" fill="url(#bgGrad)" stroke="#4f46e5" stroke-width="1.5" stroke-linejoin="round" />
-
-  <!-- Active Status Ping Dot -->
-  <circle cx="94" cy="94" r="9" fill="#10b981" stroke="#0f172a" stroke-width="3.5" />
+  <circle cx="92" cy="92" r="8.5" fill="#10b981" stroke="#0c101a" stroke-width="3.5" />
 </svg>
