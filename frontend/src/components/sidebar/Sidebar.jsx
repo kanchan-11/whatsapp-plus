@@ -128,7 +128,7 @@ export const Sidebar = ({
       </div>
 
       {/* Chat List */}
-      <div className="flex-1 overflow-y-auto px-2 py-2 space-y-1">
+      <div className="flex-1 overflow-y-auto px-2 py-2 space-y-1 pb-20 md:pb-2">
         {isLoading ? (
           <div className="p-8 text-center text-xs text-slate-400">
             Loading conversations...

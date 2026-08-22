@@ -166,31 +166,31 @@ export const MessageInput = ({ onSendMessage, onTyping }) => {
   };
 
   return (
-    <div className="bg-[#0f1422] px-5 py-3 relative border-t border-slate-800/80">
+    <div className="bg-[#0f1422] px-3 sm:px-5 py-2 sm:py-3 relative border-t border-slate-800/80 shrink-0">
       {/* File Preview before sending */}
       {previewAttachment && (
-        <div className="mb-3 p-3 bg-slate-900/90 rounded-2xl border border-slate-800 flex items-center justify-between shadow-lg">
-          <div className="flex items-center gap-3.5 min-w-0">
+        <div className="mb-2 sm:mb-3 p-2.5 sm:p-3 bg-slate-900/90 rounded-2xl border border-slate-800 flex items-center justify-between shadow-lg">
+          <div className="flex items-center gap-3 min-w-0">
             {previewAttachment.fileType?.startsWith('image/') ? (
               <img
                 src={previewAttachment.fileUrl}
                 alt="preview"
-                className="w-14 h-14 object-cover rounded-xl border border-white/10"
+                className="w-12 h-12 sm:w-14 sm:h-14 object-cover rounded-xl border border-white/10"
               />
             ) : previewAttachment.fileType?.startsWith('video/') ? (
-              <div className="w-14 h-14 bg-violet-500/20 rounded-xl flex items-center justify-center text-violet-400">
-                <VideoIcon className="w-6 h-6" />
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-violet-500/20 rounded-xl flex items-center justify-center text-violet-400">
+                <VideoIcon className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
             ) : (
-              <div className="w-14 h-14 bg-indigo-500/20 rounded-xl flex items-center justify-center text-indigo-400">
-                <FileText className="w-6 h-6" />
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-indigo-500/20 rounded-xl flex items-center justify-center text-indigo-400">
+                <FileText className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
             )}
             <div className="truncate">
               <p className="text-xs font-semibold text-slate-100 truncate">
                 {previewAttachment.fileName}
               </p>
-              <p className="text-[11px] text-slate-400">Ready to send • Add a caption below</p>
+              <p className="text-[10px] sm:text-[11px] text-slate-400">Ready to send • Add a caption below</p>
             </div>
           </div>
           <button
@@ -204,14 +204,14 @@ export const MessageInput = ({ onSendMessage, onTyping }) => {
 
       {/* Emoji Picker Popup */}
       {showEmojiPicker && (
-        <div className="absolute bottom-18 left-5 z-50 shadow-2xl rounded-2xl overflow-hidden border border-slate-800">
+        <div className="absolute bottom-16 sm:bottom-18 left-2 sm:left-5 z-50 shadow-2xl rounded-2xl overflow-hidden border border-slate-800 max-w-[calc(100vw-20px)]">
           <EmojiPicker
             theme={Theme.DARK}
             onEmojiClick={handleEmojiClick}
             lazyLoadEmojis={true}
             searchDisabled={false}
-            width={340}
-            height={390}
+            width="100%"
+            height={360}
           />
         </div>
       )}

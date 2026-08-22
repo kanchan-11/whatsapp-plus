@@ -16,6 +16,7 @@ export const ChatArea = ({
   chat,
   onGroupUpdated,
   onNewMessageReceived,
+  onBack,
 }) => {
   const { user } = useAuth();
   const { subscribe, sendTyping } = useSocket();
@@ -148,7 +149,7 @@ export const ChatArea = ({
     }
   };
 
-  // If no chat selected, display modern app welcome splash
+  // If no chat selected, display modern app welcome splash (hidden on mobile)
   if (!chat) {
     return (
       <div className="hidden md:flex flex-1 flex-col items-center justify-center bg-[#0a0e17] chat-bg p-8 text-center select-none relative">
@@ -173,43 +174,44 @@ export const ChatArea = ({
   }
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#0a0e17] chat-bg overflow-hidden relative">
+    <div className="flex-1 flex flex-col h-full bg-[#0a0e17] chat-bg overflow-hidden relative w-full">
       {/* Chat Header */}
       <ChatHeader
         chat={chat}
         currentUserId={user?.id}
         typingUsers={typingUsers}
         onOpenGroupInfo={() => setIsGroupInfoOpen(true)}
+        onBack={onBack}
       />
 
       {/* Ongoing Group Call Alert Banner */}
       {activeCallInGroup && (
-        <div className="bg-gradient-to-r from-indigo-950/90 via-slate-900/95 to-violet-950/90 border-b border-indigo-500/30 px-5 py-3 flex items-center justify-between shadow-lg z-10 animate-in slide-in-from-top-2 select-none backdrop-blur-md">
-          <div className="flex items-center gap-3.5 min-w-0">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white shrink-0 shadow-md shadow-indigo-500/30 animate-pulse">
+        <div className="bg-gradient-to-r from-indigo-950/90 via-slate-900/95 to-violet-950/90 border-b border-indigo-500/30 px-3 sm:px-5 py-2.5 sm:py-3 flex items-center justify-between shadow-lg z-10 animate-in slide-in-from-top-2 select-none backdrop-blur-md">
+          <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white shrink-0 shadow-md shadow-indigo-500/30 animate-pulse">
               {activeCallInGroup.callType === 'VIDEO' ? (
-                <Video className="w-4.5 h-4.5" />
+                <Video className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
               ) : (
-                <PhoneCall className="w-4.5 h-4.5" />
+                <PhoneCall className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
               )}
             </div>
 
             <div className="truncate">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2">
                 <span className="text-xs font-bold text-white truncate">
-                  Ongoing Group {activeCallInGroup.callType === 'VIDEO' ? 'Video' : 'Voice'} Call
+                  Group {activeCallInGroup.callType === 'VIDEO' ? 'Video' : 'Voice'} Call
                 </span>
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping shrink-0"></span>
               </div>
-              <p className="text-[11px] text-slate-400 truncate">
+              <p className="text-[10px] sm:text-[11px] text-slate-400 truncate">
                 Started by <span className="text-indigo-300 font-medium">{activeCallInGroup.callerName}</span> • {activeCallInGroup.participants?.length || 1} connected
               </p>
             </div>
           </div>
 
-          <div className="shrink-0 ml-3">
+          <div className="shrink-0 ml-2 sm:ml-3">
             {isAlreadyInThisCall ? (
-              <span className="px-3.5 py-1.5 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 text-xs font-semibold rounded-xl flex items-center gap-1.5 shadow-sm">
+              <span className="px-2.5 sm:px-3.5 py-1 sm:py-1.5 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 text-[11px] sm:text-xs font-semibold rounded-xl flex items-center gap-1.5 shadow-sm">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
                 In Call
               </span>
@@ -217,10 +219,10 @@ export const ChatArea = ({
               <button
                 type="button"
                 onClick={() => joinActiveGroupCall(chat.id, activeCallInGroup)}
-                className="px-4 py-1.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-bold rounded-xl transition flex items-center gap-1.5 shadow-lg shadow-indigo-600/30 hover:scale-105 active:scale-95 cursor-pointer"
+                className="px-3 sm:px-4 py-1.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-[11px] sm:text-xs font-bold rounded-xl transition flex items-center gap-1.5 shadow-lg shadow-indigo-600/30 hover:scale-105 active:scale-95 cursor-pointer"
               >
                 <PhoneCall className="w-3.5 h-3.5" />
-                <span>Join Call</span>
+                <span>Join</span>
               </button>
             )}
           </div>

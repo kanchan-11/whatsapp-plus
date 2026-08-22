@@ -14,7 +14,7 @@ import { CallOverlay } from './components/call/CallOverlay';
 import { chatService } from './services/chatService';
 import { callService } from './services/callService';
 import { soundService } from './services/soundService';
-import { Loader2, LogOut, Zap } from 'lucide-react';
+import { Loader2, LogOut } from 'lucide-react';
 
 const MainLayout = () => {
   const { user, logout, isAuthenticated, isLoading: authLoading } = useAuth();
@@ -185,53 +185,67 @@ const MainLayout = () => {
   }
 
   const selectedChat = chats.find((c) => c.id === selectedChatId) || null;
+  const isChatOpenOnMobile = selectedChatId !== null && activeTab === 'CHATS';
 
   return (
     <div className="h-screen w-screen bg-[#070a10] flex items-center justify-center overflow-hidden">
       {/* App Container */}
-      <div className="w-full h-full max-w-[1850px] max-h-[1080px] flex overflow-hidden shadow-2xl bg-[#0a0e17] border border-slate-800/60 rounded-none sm:rounded-3xl">
+      <div className="w-full h-full max-w-[1850px] max-h-[1080px] flex overflow-hidden shadow-2xl bg-[#0a0e17] border-0 md:border md:border-slate-800/60 rounded-none sm:rounded-3xl relative">
         {/* Dock Navigation Rail (Chats, Calls, Settings, Profile, Logout) */}
         <NavigationRail
           activeTab={activeTab}
-          onSelectTab={(tab) => setActiveTab(tab)}
+          onSelectTab={(tab) => {
+            setActiveTab(tab);
+            if (tab === 'CALLS') setSelectedChatId(null);
+          }}
           onOpenProfile={() => setIsProfileOpen(true)}
           onOpenLogoutConfirm={() => setIsLogoutConfirmOpen(true)}
           unreadChatsCount={totalUnreadChats}
           missedCallsCount={missedCallsCount}
+          isChatOpen={isChatOpenOnMobile}
         />
 
         {/* Dynamic Sidebar View (Chats vs Calls) */}
         {activeTab === 'CHATS' ? (
-          <Sidebar
-            chats={chats}
-            selectedChatId={selectedChatId}
-            onSelectChat={(id) => {
-              setSelectedChatId(id);
-              setChats((prev) =>
-                prev.map((c) => (c.id === id ? { ...c, unreadCount: 0 } : c))
-              );
-            }}
-            onStartDirectChat={handleStartDirectChat}
-            onCreateGroupChat={handleCreateGroupChat}
-            isLoading={isLoadingChats}
-          />
+          <div className={`h-full ${selectedChatId ? 'hidden md:flex' : 'flex w-full md:w-auto'}`}>
+            <Sidebar
+              chats={chats}
+              selectedChatId={selectedChatId}
+              onSelectChat={(id) => {
+                setSelectedChatId(id);
+                setChats((prev) =>
+                  prev.map((c) => (c.id === id ? { ...c, unreadCount: 0 } : c))
+                );
+              }}
+              onStartDirectChat={handleStartDirectChat}
+              onCreateGroupChat={handleCreateGroupChat}
+              isLoading={isLoadingChats}
+            />
+          </div>
         ) : (
-          <CallsSidebar
-            callLogs={callLogs}
-            isLoading={isLoadingCalls}
-            onStartCallWithUser={(targetUser, type) => startCall(targetUser, type)}
-          />
+          <div className="h-full flex w-full md:w-auto">
+            <CallsSidebar
+              callLogs={callLogs}
+              isLoading={isLoadingCalls}
+              onStartCallWithUser={(targetUser, type) => startCall(targetUser, type)}
+            />
+          </div>
         )}
 
         {/* Dynamic Main Panel View */}
         {activeTab === 'CHATS' ? (
-          <ChatArea
-            chat={selectedChat}
-            onGroupUpdated={handleGroupUpdated}
-            onNewMessageReceived={handleNewMessageReceived}
-          />
+          <div className={`flex-1 h-full ${selectedChatId ? 'flex' : 'hidden md:flex'}`}>
+            <ChatArea
+              chat={selectedChat}
+              onGroupUpdated={handleGroupUpdated}
+              onNewMessageReceived={handleNewMessageReceived}
+              onBack={() => setSelectedChatId(null)}
+            />
+          </div>
         ) : (
-          <CallsSplash />
+          <div className="hidden md:flex flex-1 h-full">
+            <CallsSplash />
+          </div>
         )}
       </div>
 

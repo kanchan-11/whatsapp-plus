@@ -267,11 +267,11 @@ export const CallOverlay = () => {
             )}
 
             {/* Local Video PIP (Picture-in-Picture) */}
-            <div className="absolute top-4 right-4 w-36 sm:w-48 h-48 sm:h-64 bg-[#202c33] rounded-2xl overflow-hidden border-2 border-white/20 shadow-2xl z-20">
+            <div className="absolute top-3 right-3 sm:top-4 sm:right-4 w-28 sm:w-48 h-38 sm:h-64 bg-[#202c33] rounded-2xl overflow-hidden border-2 border-white/20 shadow-2xl z-20">
               {isVideoOff ? (
                 <div className="w-full h-full flex flex-col items-center justify-center text-[#8696a0]">
-                  <VideoOff className="w-8 h-8 mb-1 text-red-400" />
-                  <span className="text-[10px]">Camera off</span>
+                  <VideoOff className="w-6 h-6 sm:w-8 sm:h-8 mb-1 text-red-400" />
+                  <span className="text-[9px] sm:text-[10px]">Camera off</span>
                 </div>
               ) : (
                 <video
