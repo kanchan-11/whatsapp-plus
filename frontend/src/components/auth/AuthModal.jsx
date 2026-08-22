@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { socialAuthService } from '../../services/socialAuthService';
 import { CameraCaptureModal } from '../media/CameraCaptureModal';
@@ -16,7 +16,8 @@ import {
   Plus, 
   Check, 
   Zap, 
-  X 
+  X,
+  Github
 } from 'lucide-react';
 
 const PRESET_AVATARS = [
@@ -71,10 +72,10 @@ export const AuthModal = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [socialLoading, setSocialLoading] = useState(null); // 'google' | 'github' | null
 
-  // Social Modal Prompt Fallback
+  // Social Account Selection Modal
   const [socialModalProvider, setSocialModalProvider] = useState(null);
-  const [socialName, setSocialName] = useState('');
-  const [socialEmail, setSocialEmail] = useState('');
+  const [socialIdentifier, setSocialIdentifier] = useState('');
+  const [socialDisplayName, setSocialDisplayName] = useState('');
 
   // Media / Avatar upload states
   const [isAddPhotoDropdownOpen, setIsAddPhotoDropdownOpen] = useState(false);
@@ -101,64 +102,33 @@ export const AuthModal = () => {
     }
   };
 
-  // Direct Google Sign In
-  const handleGoogleSignIn = async () => {
+  const handleOpenSocialModal = (provider) => {
     setError('');
-    setSocialLoading('google');
-    try {
-      // 1. Attempt direct Google SDK / Popup fetch
-      const profile = await socialAuthService.directGoogleSignIn();
-      await socialLogin(profile);
-    } catch (err) {
-      console.warn('Direct Google sign-in prompt', err);
-      // If direct SDK popup was cancelled or needs manual selection, open account confirmation
-      setSocialModalProvider('google');
-      setSocialName('Google User');
-      setSocialEmail('user@gmail.com');
-    } finally {
-      setSocialLoading(null);
+    setSocialModalProvider(provider);
+    if (provider === 'google') {
+      setSocialIdentifier('agarwallkanchan29@gmail.com');
+      setSocialDisplayName('Kanchan');
+    } else {
+      setSocialIdentifier('kanchan-11');
+      setSocialDisplayName('Kanchan Agarwal');
     }
   };
 
-  // Direct GitHub Sign In
-  const handleGitHubSignIn = async () => {
+  const handleExecuteSocialLogin = async (provider, identifier, displayName) => {
     setError('');
-    setSocialLoading('github');
+    setSocialLoading(provider);
     try {
-      const profile = await socialAuthService.directGitHubSignIn();
-      await socialLogin(profile);
-    } catch (err) {
-      console.warn('Direct GitHub sign-in prompt', err);
-      if (err.message && !err.message.includes('cancelled')) {
-        setError(err.message);
+      let profile;
+      if (provider === 'google') {
+        profile = await socialAuthService.directGoogleSignIn(identifier, displayName);
+      } else {
+        profile = await socialAuthService.directGitHubSignIn(identifier);
       }
-    } finally {
-      setSocialLoading(null);
-    }
-  };
-
-  const handleSocialSubmit = async (e) => {
-    e.preventDefault();
-    if (!socialModalProvider) return;
-
-    setError('');
-    setSocialLoading(socialModalProvider);
-    try {
-      const avatarSeed = socialName.replace(/\s+/g, '').toLowerCase() || socialModalProvider;
-      const avatarUrl = socialModalProvider === 'github'
-        ? `https://api.dicebear.com/7.x/identicon/svg?seed=${avatarSeed}`
-        : `https://api.dicebear.com/7.x/bottts/svg?seed=${avatarSeed}`;
-
-      await socialLogin({
-        provider: socialModalProvider,
-        email: socialEmail.trim().toLowerCase(),
-        name: socialName.trim(),
-        avatarUrl: avatarUrl,
-        providerId: `${socialModalProvider}_${Date.now()}`,
-      });
+      await socialLogin(profile);
       setSocialModalProvider(null);
     } catch (err) {
-      setError(err.response?.data?.message || `${socialModalProvider} sign-in failed`);
+      console.error('Social login error', err);
+      setError(err.response?.data?.message || err.message || `${provider} sign-in failed`);
     } finally {
       setSocialLoading(null);
     }
@@ -237,7 +207,7 @@ export const AuthModal = () => {
           <button
             type="button"
             disabled={isLoading || !!socialLoading}
-            onClick={handleGoogleSignIn}
+            onClick={() => handleOpenSocialModal('google')}
             className="py-2.5 px-3 bg-slate-900/90 hover:bg-slate-800 border border-slate-750 hover:border-slate-650 rounded-2xl text-xs font-semibold text-slate-200 transition cursor-pointer flex items-center justify-center gap-2 shadow-xs hover:scale-102 active:scale-98"
           >
             {socialLoading === 'google' ? (
@@ -252,7 +222,7 @@ export const AuthModal = () => {
           <button
             type="button"
             disabled={isLoading || !!socialLoading}
-            onClick={handleGitHubSignIn}
+            onClick={() => handleOpenSocialModal('github')}
             className="py-2.5 px-3 bg-slate-900/90 hover:bg-slate-800 border border-slate-750 hover:border-slate-650 rounded-2xl text-xs font-semibold text-slate-200 transition cursor-pointer flex items-center justify-center gap-2 shadow-xs hover:scale-102 active:scale-98"
           >
             {socialLoading === 'github' ? (
@@ -507,15 +477,15 @@ export const AuthModal = () => {
         </div>
       </div>
 
-      {/* Social OAuth Profile Confirmation Modal */}
+      {/* Social Account Selector & Instant Login Modal */}
       {socialModalProvider && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in select-none">
-          <div className="w-full max-w-sm bg-[#0f1422] border border-slate-800 rounded-3xl shadow-2xl p-6 flex flex-col animate-in zoom-in-95 shadow-indigo-950/30">
+        <div className="fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-in fade-in select-none">
+          <div className="w-full max-w-sm bg-[#0f1422] border border-slate-800 rounded-3xl shadow-2xl p-6 flex flex-col animate-in zoom-in-95 shadow-indigo-950/40">
             <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
               <div className="flex items-center gap-2.5">
                 {socialModalProvider === 'google' ? <GoogleIcon /> : <GitHubIcon />}
                 <h3 className="text-sm font-bold text-white">
-                  Continue with {socialModalProvider === 'google' ? 'Google' : 'GitHub'}
+                  Sign in with {socialModalProvider === 'google' ? 'Google' : 'GitHub'}
                 </h3>
               </div>
               <button
@@ -527,56 +497,78 @@ export const AuthModal = () => {
               </button>
             </div>
 
-            <form onSubmit={handleSocialSubmit} className="space-y-3.5">
+            {/* Quick 1-Click Profile Card */}
+            <div className="mb-4 p-3.5 bg-slate-900/90 rounded-2xl border border-slate-750 flex items-center justify-between">
+              <div className="flex items-center gap-3 min-w-0">
+                <img
+                  src={
+                    socialModalProvider === 'google'
+                      ? `https://api.dicebear.com/7.x/initials/svg?seed=${socialIdentifier.split('@')[0]}&backgroundColor=4285f4,34a853,fbbc05,ea4335`
+                      : `https://api.dicebear.com/7.x/identicon/svg?seed=${socialIdentifier}`
+                  }
+                  alt="avatar"
+                  className="w-10 h-10 rounded-full object-cover border border-slate-700 bg-slate-800 shrink-0"
+                />
+                <div className="truncate">
+                  <p className="text-xs font-bold text-white truncate">{socialDisplayName || socialIdentifier}</p>
+                  <p className="text-[11px] text-slate-400 truncate">{socialIdentifier}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Custom Input for Any Account */}
+            <div className="space-y-3 mb-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
-                  Your Name
+                <label className="block text-[11px] font-semibold text-slate-400 mb-1">
+                  {socialModalProvider === 'google' ? 'Google Email' : 'GitHub Username'}
                 </label>
                 <input
                   type="text"
                   required
-                  value={socialName}
-                  onChange={(e) => setSocialName(e.target.value)}
-                  placeholder="e.g. Alex Rivera"
+                  value={socialIdentifier}
+                  onChange={(e) => setSocialIdentifier(e.target.value)}
+                  placeholder={socialModalProvider === 'google' ? 'you@gmail.com' : 'your-github-handle'}
                   className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-750 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 rounded-xl text-slate-100 placeholder-slate-500 outline-none text-xs"
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  required
-                  value={socialEmail}
-                  onChange={(e) => setSocialEmail(e.target.value)}
-                  placeholder="user@example.com"
-                  className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-750 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 rounded-xl text-slate-100 placeholder-slate-500 outline-none text-xs"
-                />
-              </div>
+              {socialModalProvider === 'google' && (
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-400 mb-1">
+                    Display Name
+                  </label>
+                  <input
+                    type="text"
+                    value={socialDisplayName}
+                    onChange={(e) => setSocialDisplayName(e.target.value)}
+                    placeholder="Your Name"
+                    className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-750 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 rounded-xl text-slate-100 placeholder-slate-500 outline-none text-xs"
+                  />
+                </div>
+              )}
+            </div>
 
-              <div className="flex items-center gap-2.5 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setSocialModalProvider(null)}
-                  className="flex-1 py-2.5 px-3 bg-slate-800 hover:bg-slate-750 text-slate-300 text-xs font-semibold rounded-xl transition cursor-pointer border border-slate-700"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={!!socialLoading}
-                  className="flex-1 py-2.5 px-3 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-bold rounded-xl transition cursor-pointer shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-1.5"
-                >
-                  {socialLoading ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  ) : (
-                    <span>Sign In</span>
-                  )}
-                </button>
-              </div>
-            </form>
+            <div className="flex items-center gap-2.5 pt-1">
+              <button
+                type="button"
+                onClick={() => setSocialModalProvider(null)}
+                className="flex-1 py-2.5 px-3 bg-slate-800 hover:bg-slate-750 text-slate-300 text-xs font-semibold rounded-xl transition cursor-pointer border border-slate-700"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={!!socialLoading}
+                onClick={() => handleExecuteSocialLogin(socialModalProvider, socialIdentifier, socialDisplayName)}
+                className="flex-1 py-2.5 px-3 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-bold rounded-xl transition cursor-pointer shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-1.5"
+              >
+                {socialLoading ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <span>Continue</span>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}
