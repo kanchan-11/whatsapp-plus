@@ -1,5 +1,6 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { socialAuthService } from '../../services/socialAuthService';
 import { CameraCaptureModal } from '../media/CameraCaptureModal';
 import { InstantPingLogo } from '../common/InstantPingLogo';
 import { 
@@ -70,7 +71,7 @@ export const AuthModal = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [socialLoading, setSocialLoading] = useState(null); // 'google' | 'github' | null
 
-  // Social Modal Prompt
+  // Social Modal Prompt Fallback
   const [socialModalProvider, setSocialModalProvider] = useState(null);
   const [socialName, setSocialName] = useState('');
   const [socialEmail, setSocialEmail] = useState('');
@@ -100,15 +101,39 @@ export const AuthModal = () => {
     }
   };
 
-  const handleSocialClick = (provider) => {
+  // Direct Google Sign In
+  const handleGoogleSignIn = async () => {
     setError('');
-    setSocialModalProvider(provider);
-    if (provider === 'google') {
+    setSocialLoading('google');
+    try {
+      // 1. Attempt direct Google SDK / Popup fetch
+      const profile = await socialAuthService.directGoogleSignIn();
+      await socialLogin(profile);
+    } catch (err) {
+      console.warn('Direct Google sign-in prompt', err);
+      // If direct SDK popup was cancelled or needs manual selection, open account confirmation
+      setSocialModalProvider('google');
       setSocialName('Google User');
       setSocialEmail('user@gmail.com');
-    } else {
-      setSocialName('GitHub User');
-      setSocialEmail('developer@github.com');
+    } finally {
+      setSocialLoading(null);
+    }
+  };
+
+  // Direct GitHub Sign In
+  const handleGitHubSignIn = async () => {
+    setError('');
+    setSocialLoading('github');
+    try {
+      const profile = await socialAuthService.directGitHubSignIn();
+      await socialLogin(profile);
+    } catch (err) {
+      console.warn('Direct GitHub sign-in prompt', err);
+      if (err.message && !err.message.includes('cancelled')) {
+        setError(err.message);
+      }
+    } finally {
+      setSocialLoading(null);
     }
   };
 
@@ -206,13 +231,13 @@ export const AuthModal = () => {
           </p>
         </div>
 
-        {/* Social Login Buttons (Google & GitHub) */}
+        {/* Direct Social Login Buttons (Google & GitHub) */}
         <div className="grid grid-cols-2 gap-2.5 mb-4">
           {/* Sign in with Google */}
           <button
             type="button"
             disabled={isLoading || !!socialLoading}
-            onClick={() => handleSocialClick('google')}
+            onClick={handleGoogleSignIn}
             className="py-2.5 px-3 bg-slate-900/90 hover:bg-slate-800 border border-slate-750 hover:border-slate-650 rounded-2xl text-xs font-semibold text-slate-200 transition cursor-pointer flex items-center justify-center gap-2 shadow-xs hover:scale-102 active:scale-98"
           >
             {socialLoading === 'google' ? (
@@ -227,7 +252,7 @@ export const AuthModal = () => {
           <button
             type="button"
             disabled={isLoading || !!socialLoading}
-            onClick={() => handleSocialClick('github')}
+            onClick={handleGitHubSignIn}
             className="py-2.5 px-3 bg-slate-900/90 hover:bg-slate-800 border border-slate-750 hover:border-slate-650 rounded-2xl text-xs font-semibold text-slate-200 transition cursor-pointer flex items-center justify-center gap-2 shadow-xs hover:scale-102 active:scale-98"
           >
             {socialLoading === 'github' ? (
