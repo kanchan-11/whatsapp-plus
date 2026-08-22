@@ -51,6 +51,13 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
+  const socialLogin = async (socialData) => {
+    const data = await authService.socialLogin(socialData);
+    setUser(data.user);
+    setToken(data.token);
+    return data;
+  };
+
   const logout = () => {
     authService.logout();
     setUser(null);
@@ -72,6 +79,7 @@ export const AuthProvider = ({ children }) => {
         isLoading,
         login,
         register,
+        socialLogin,
         logout,
         updateProfile,
       }}

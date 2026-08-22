@@ -32,6 +32,12 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/social")
+    public ResponseEntity<AuthResponse> socialLogin(@Valid @RequestBody com.chatapp.dto.SocialLoginRequest request) {
+        AuthResponse response = userService.socialLogin(request);
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/me")
     public ResponseEntity<UserDto> getCurrentUser() {
         return ResponseEntity.ok(userService.getCurrentUser());

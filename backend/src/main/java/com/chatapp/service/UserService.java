@@ -76,6 +76,65 @@ public class UserService {
         return new AuthResponse(token, toDto(user));
     }
 
+    @Transactional
+    public AuthResponse socialLogin(com.chatapp.dto.SocialLoginRequest request) {
+        String email = request.getEmail() != null && !request.getEmail().isBlank()
+                ? request.getEmail().trim().toLowerCase()
+                : null;
+
+        String baseUsername;
+        if (email != null && email.contains("@")) {
+            baseUsername = email.substring(0, email.indexOf('@')).replaceAll("[^a-zA-Z0-9_]", "");
+        } else {
+            baseUsername = request.getName().toLowerCase().replaceAll("[^a-zA-Z0-9_]", "");
+        }
+        if (baseUsername.isBlank()) {
+            baseUsername = request.getProvider().toLowerCase() + "_user";
+        }
+
+        User user = null;
+        if (email != null) {
+            user = userRepository.findByEmail(email).orElse(null);
+        }
+        if (user == null) {
+            user = userRepository.findByUsername(baseUsername).orElse(null);
+        }
+
+        if (user == null) {
+            // Create new social user
+            user = new User();
+            String uniqueUsername = baseUsername;
+            int counter = 1;
+            while (userRepository.existsByUsername(uniqueUsername)) {
+                uniqueUsername = baseUsername + counter++;
+            }
+            user.setUsername(uniqueUsername);
+            user.setEmail(email != null ? email : uniqueUsername + "@" + request.getProvider().toLowerCase() + ".oauth");
+            user.setPassword(passwordEncoder.encode(java.util.UUID.randomUUID().toString()));
+            user.setDisplayName(request.getName().trim());
+            user.setAvatarUrl(request.getAvatarUrl() != null && !request.getAvatarUrl().isBlank()
+                    ? request.getAvatarUrl()
+                    : "https://api.dicebear.com/7.x/bottts/svg?seed=" + uniqueUsername);
+            user.setOnline(true);
+            user.setLastSeen(LocalDateTime.now());
+            user = userRepository.save(user);
+        } else {
+            // Existing user update
+            if (request.getAvatarUrl() != null && !request.getAvatarUrl().isBlank()) {
+                user.setAvatarUrl(request.getAvatarUrl());
+            }
+            if (request.getName() != null && !request.getName().isBlank()) {
+                user.setDisplayName(request.getName().trim());
+            }
+            user.setOnline(true);
+            user.setLastSeen(LocalDateTime.now());
+            user = userRepository.save(user);
+        }
+
+        String token = jwtService.generateToken(user.getUsername(), user.getId());
+        return new AuthResponse(token, toDto(user));
+    }
+
     public User getCurrentUserEntity() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String username;

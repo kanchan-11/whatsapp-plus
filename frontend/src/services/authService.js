@@ -19,6 +19,15 @@ export const authService = {
     return res.data;
   },
 
+  async socialLogin(data) {
+    const res = await api.post('/auth/social', data);
+    if (res.data.token) {
+      localStorage.setItem('token', res.data.token);
+      localStorage.setItem('user', JSON.stringify(res.data.user));
+    }
+    return res.data;
+  },
+
   async getMe() {
     const res = await api.get('/auth/me');
     return res.data;

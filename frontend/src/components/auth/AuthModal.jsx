@@ -1,81 +1,98 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { chatService } from '../../services/chatService';
 import { CameraCaptureModal } from '../media/CameraCaptureModal';
 import { InstantPingLogo } from '../common/InstantPingLogo';
 import { 
-  Lock, 
   User, 
+  Lock, 
   Mail, 
   Sparkles, 
-  Loader2, 
   ArrowRight, 
-  Zap, 
+  Loader2, 
   Image as ImageIcon, 
   Camera, 
+  ChevronDown, 
+  Plus, 
   Check, 
-  Plus,
-  ChevronDown
+  Zap, 
+  X 
 } from 'lucide-react';
 
+const PRESET_AVATARS = [
+  'https://api.dicebear.com/7.x/bottts/svg?seed=alex',
+  'https://api.dicebear.com/7.x/bottts/svg?seed=sarah',
+  'https://api.dicebear.com/7.x/bottts/svg?seed=felix',
+  'https://api.dicebear.com/7.x/bottts/svg?seed=mimi',
+  'https://api.dicebear.com/7.x/bottts/svg?seed=shadow',
+  'https://api.dicebear.com/7.x/bottts/svg?seed=sparky',
+];
+
+// SVG Icon for Google
+const GoogleIcon = () => (
+  <svg className="w-4 h-4" viewBox="0 0 24 24">
+    <path
+      fill="#4285F4"
+      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+    />
+    <path
+      fill="#34A853"
+      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+    />
+    <path
+      fill="#FBBC05"
+      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+    />
+    <path
+      fill="#EA4335"
+      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+    />
+  </svg>
+);
+
+// SVG Icon for GitHub
+const GitHubIcon = () => (
+  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+    <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+  </svg>
+);
+
 export const AuthModal = () => {
-  const { login, register } = useAuth();
+  const { login, register, socialLogin } = useAuth();
   const [isRegister, setIsRegister] = useState(false);
   const [formData, setFormData] = useState({
     username: '',
     email: '',
     password: '',
     displayName: '',
-    avatarUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=Felix',
+    avatarUrl: PRESET_AVATARS[0],
   });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isCameraOpen, setIsCameraOpen] = useState(false);
-  const [isAddPhotoDropdownOpen, setIsAddPhotoDropdownOpen] = useState(false);
-  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [socialLoading, setSocialLoading] = useState(null); // 'google' | 'github' | null
 
+  // Social Modal Prompt
+  const [socialModalProvider, setSocialModalProvider] = useState(null);
+  const [socialName, setSocialName] = useState('');
+  const [socialEmail, setSocialEmail] = useState('');
+
+  // Media / Avatar upload states
+  const [isAddPhotoDropdownOpen, setIsAddPhotoDropdownOpen] = useState(false);
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const fileInputRef = useRef(null);
   const dropdownRef = useRef(null);
 
-  // Close dropdown on outside click
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsAddPhotoDropdownOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  // Modern Avatar Icon Presets
-  const avatarIcons = [
-    { label: 'Robot 1', url: 'https://api.dicebear.com/7.x/bottts/svg?seed=Felix' },
-    { label: 'Robot 2', url: 'https://api.dicebear.com/7.x/bottts/svg?seed=Shadow' },
-    { label: 'Avatar 1', url: 'https://api.dicebear.com/7.x/lorelei/svg?seed=Coco' },
-    { label: 'Avatar 2', url: 'https://api.dicebear.com/7.x/lorelei/svg?seed=Precious' },
-    { label: 'Adventurer 1', url: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Gizmo' },
-    { label: 'Adventurer 2', url: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Garfield' },
-    { label: 'Modern 1', url: 'https://api.dicebear.com/7.x/micah/svg?seed=Zoe' },
-    { label: 'Modern 2', url: 'https://api.dicebear.com/7.x/micah/svg?seed=Jack' },
-    { label: 'Persona 1', url: 'https://api.dicebear.com/7.x/open-peeps/svg?seed=Sam' },
-    { label: 'Persona 2', url: 'https://api.dicebear.com/7.x/open-peeps/svg?seed=Avery' },
-  ];
-
   const demoAccounts = [
-    { username: 'user', name: 'Demo User', role: 'Main User' },
-    { username: 'alice', name: 'Alice Walker', role: 'Peer Contact' },
-    { username: 'bob', name: 'Bob Miller', role: 'Peer Contact' },
+    { name: 'Demo User', username: 'user', pass: 'password123' },
+    { name: 'Alice', username: 'alice', pass: 'password123' },
+    { name: 'Bob', username: 'bob', pass: 'password123' },
   ];
 
   const handleQuickLogin = async (username) => {
     setError('');
     setIsLoading(true);
     try {
-      await login({
-        usernameOrEmail: username,
-        password: 'password123',
-      });
+      await login({ usernameOrEmail: username, password: 'password123' });
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');
     } finally {
@@ -83,38 +100,67 @@ export const AuthModal = () => {
     }
   };
 
+  const handleSocialClick = (provider) => {
+    setError('');
+    setSocialModalProvider(provider);
+    if (provider === 'google') {
+      setSocialName('Google User');
+      setSocialEmail('user@gmail.com');
+    } else {
+      setSocialName('GitHub User');
+      setSocialEmail('developer@github.com');
+    }
+  };
+
+  const handleSocialSubmit = async (e) => {
+    e.preventDefault();
+    if (!socialModalProvider) return;
+
+    setError('');
+    setSocialLoading(socialModalProvider);
+    try {
+      const avatarSeed = socialName.replace(/\s+/g, '').toLowerCase() || socialModalProvider;
+      const avatarUrl = socialModalProvider === 'github'
+        ? `https://api.dicebear.com/7.x/identicon/svg?seed=${avatarSeed}`
+        : `https://api.dicebear.com/7.x/bottts/svg?seed=${avatarSeed}`;
+
+      await socialLogin({
+        provider: socialModalProvider,
+        email: socialEmail.trim().toLowerCase(),
+        name: socialName.trim(),
+        avatarUrl: avatarUrl,
+        providerId: `${socialModalProvider}_${Date.now()}`,
+      });
+      setSocialModalProvider(null);
+    } catch (err) {
+      setError(err.response?.data?.message || `${socialModalProvider} sign-in failed`);
+    } finally {
+      setSocialLoading(null);
+    }
+  };
+
   const handleFileChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!file.type.startsWith('image/')) {
-      setError('Please select a valid image file');
-      return;
-    }
-
     setIsUploadingAvatar(true);
     setIsAddPhotoDropdownOpen(false);
     try {
-      const res = await chatService.uploadFile(file);
-      setFormData((prev) => ({ ...prev, avatarUrl: res.fileUrl }));
-    } catch (err) {
-      console.warn('Upload failed, falling back to local data URL:', err);
       const reader = new FileReader();
-      reader.onload = (event) => {
-        if (event.target?.result) {
-          setFormData((prev) => ({ ...prev, avatarUrl: event.target.result }));
-        }
+      reader.onloadend = () => {
+        setFormData((prev) => ({ ...prev, avatarUrl: reader.result }));
+        setIsUploadingAvatar(false);
       };
       reader.readAsDataURL(file);
-    } finally {
+    } catch (err) {
+      console.error('Failed to read file', err);
       setIsUploadingAvatar(false);
-      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
-  const handleCameraCapture = (dataUrl) => {
-    setFormData((prev) => ({ ...prev, avatarUrl: dataUrl }));
-    setIsAddPhotoDropdownOpen(false);
+  const handleCameraCapture = (capturedDataUrl) => {
+    setFormData((prev) => ({ ...prev, avatarUrl: capturedDataUrl }));
+    setIsCameraOpen(false);
   };
 
   const handleSubmit = async (e) => {
@@ -124,26 +170,15 @@ export const AuthModal = () => {
 
     try {
       if (isRegister) {
-        await register({
-          username: formData.username.trim(),
-          email: formData.email.trim(),
-          password: formData.password,
-          displayName: formData.displayName.trim() || formData.username.trim(),
-          avatarUrl: formData.avatarUrl || avatarIcons[0].url,
-        });
+        await register(formData);
       } else {
         await login({
-          usernameOrEmail: formData.username.trim(),
+          usernameOrEmail: formData.username,
           password: formData.password,
         });
       }
     } catch (err) {
-      setError(
-        err.response?.data?.message ||
-        err.response?.data?.errors?.username ||
-        err.response?.data?.errors?.email ||
-        'Authentication failed. Please check your credentials.'
-      );
+      setError(err.response?.data?.message || 'Authentication failed. Please check your credentials.');
     } finally {
       setIsLoading(false);
     }
@@ -157,7 +192,7 @@ export const AuthModal = () => {
         <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-violet-600 rounded-full filter blur-[120px]"></div>
       </div>
 
-      <div className="w-full max-w-md bg-[#0f1422]/95 backdrop-blur-xl border border-slate-800 rounded-3xl shadow-2xl p-7 relative z-10 my-6 shadow-indigo-950/40">
+      <div className="w-full max-w-md bg-[#0f1422]/95 backdrop-blur-xl border border-slate-800 rounded-3xl shadow-2xl p-6 sm:p-7 relative z-10 my-6 shadow-indigo-950/40">
         {/* Logo Header */}
         <div className="text-center mb-5 flex flex-col items-center">
           <div className="mb-3">
@@ -171,9 +206,51 @@ export const AuthModal = () => {
           </p>
         </div>
 
+        {/* Social Login Buttons (Google & GitHub) */}
+        <div className="grid grid-cols-2 gap-2.5 mb-4">
+          {/* Sign in with Google */}
+          <button
+            type="button"
+            disabled={isLoading || !!socialLoading}
+            onClick={() => handleSocialClick('google')}
+            className="py-2.5 px-3 bg-slate-900/90 hover:bg-slate-800 border border-slate-750 hover:border-slate-650 rounded-2xl text-xs font-semibold text-slate-200 transition cursor-pointer flex items-center justify-center gap-2 shadow-xs hover:scale-102 active:scale-98"
+          >
+            {socialLoading === 'google' ? (
+              <Loader2 className="w-4 h-4 animate-spin text-indigo-400" />
+            ) : (
+              <GoogleIcon />
+            )}
+            <span>Google</span>
+          </button>
+
+          {/* Sign in with GitHub */}
+          <button
+            type="button"
+            disabled={isLoading || !!socialLoading}
+            onClick={() => handleSocialClick('github')}
+            className="py-2.5 px-3 bg-slate-900/90 hover:bg-slate-800 border border-slate-750 hover:border-slate-650 rounded-2xl text-xs font-semibold text-slate-200 transition cursor-pointer flex items-center justify-center gap-2 shadow-xs hover:scale-102 active:scale-98"
+          >
+            {socialLoading === 'github' ? (
+              <Loader2 className="w-4 h-4 animate-spin text-indigo-400" />
+            ) : (
+              <GitHubIcon />
+            )}
+            <span>GitHub</span>
+          </button>
+        </div>
+
+        {/* Divider */}
+        <div className="flex items-center gap-3 my-4">
+          <div className="flex-1 h-[1px] bg-slate-800"></div>
+          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+            Or continue with
+          </span>
+          <div className="flex-1 h-[1px] bg-slate-800"></div>
+        </div>
+
         {/* Quick Demo Login Bar */}
         {!isRegister && (
-          <div className="mb-5 bg-slate-900/80 border border-slate-800 p-3 rounded-2xl">
+          <div className="mb-4 bg-slate-900/80 border border-slate-800 p-3 rounded-2xl">
             <div className="flex items-center gap-1.5 text-xs text-indigo-400 font-semibold mb-2">
               <Zap className="w-3.5 h-3.5" /> 1-Click Demo Logins:
             </div>
@@ -250,131 +327,106 @@ export const AuthModal = () => {
                         className="w-full px-3 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 flex items-center gap-2.5 transition cursor-pointer"
                       >
                         <Camera className="w-4 h-4 text-violet-400" />
-                        <span>Take with Camera</span>
+                        <span>Take Photo</span>
                       </button>
                     </div>
                   )}
                 </div>
               </div>
 
-              {/* Horizontal Avatar Presets */}
-              <div className="py-2 px-1 overflow-x-auto overflow-y-visible no-scrollbar">
-                <div className="flex items-center gap-2.5 min-w-max">
-                  {!avatarIcons.some((i) => i.url === formData.avatarUrl) && formData.avatarUrl && (
-                    <div className="relative group shrink-0">
-                      <div className="w-11 h-11 rounded-2xl border-2 border-indigo-500 overflow-hidden shadow-lg shadow-indigo-500/30 p-0.5 bg-slate-900">
-                        <img
-                          src={formData.avatarUrl}
-                          alt="Custom Photo"
-                          className="w-full h-full object-cover rounded-xl"
-                        />
-                      </div>
-                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-indigo-500 text-white rounded-full flex items-center justify-center shadow">
-                        <Check className="w-2.5 h-2.5 stroke-[3]" />
-                      </div>
-                    </div>
-                  )}
-
-                  {avatarIcons.map((item, idx) => {
-                    const isSelected = formData.avatarUrl === item.url;
-                    return (
-                      <button
-                        key={idx}
-                        type="button"
-                        onClick={() => setFormData({ ...formData, avatarUrl: item.url })}
-                        className={`relative w-10 h-10 rounded-2xl shrink-0 bg-slate-800 border-2 transition-all duration-150 transform hover:scale-110 cursor-pointer overflow-hidden p-0.5 ${
-                          isSelected
-                            ? 'border-indigo-500 scale-110 shadow-lg shadow-indigo-500/30 ring-2 ring-indigo-500/40'
-                            : 'border-transparent opacity-75 hover:opacity-100 hover:border-slate-700'
-                        }`}
-                        title={item.label}
-                      >
-                        <img
-                          src={item.url}
-                          alt={item.label}
-                          className="w-full h-full object-cover rounded-xl pointer-events-none"
-                        />
-                        {isSelected && (
-                          <div className="absolute inset-0 bg-indigo-600/30 flex items-center justify-center rounded-xl">
-                            <Check className="w-3.5 h-3.5 text-indigo-400 stroke-[3]" />
-                          </div>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
+              {/* Preset Avatars Row */}
+              <div className="flex items-center justify-between gap-1.5 py-1">
+                {PRESET_AVATARS.map((url, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => setFormData({ ...formData, avatarUrl: url })}
+                    className={`relative p-1 rounded-2xl border-2 transition cursor-pointer hover:scale-105 ${
+                      formData.avatarUrl === url
+                        ? 'border-indigo-500 bg-indigo-500/20 shadow-md shadow-indigo-500/30'
+                        : 'border-transparent hover:border-slate-700 bg-slate-850'
+                    }`}
+                  >
+                    <img
+                      src={url}
+                      alt={`Avatar ${i + 1}`}
+                      className="w-10 h-10 rounded-xl object-cover"
+                    />
+                    {formData.avatarUrl === url && (
+                      <span className="absolute -top-1 -right-1 bg-indigo-600 text-white rounded-full p-0.5 shadow-xs">
+                        <Check className="w-2.5 h-2.5" />
+                      </span>
+                    )}
+                  </button>
+                ))}
               </div>
             </div>
           )}
 
+          {/* Display Name (for Register) */}
+          {isRegister && (
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 mb-1">
+                Display Name
+              </label>
+              <div className="relative">
+                <Sparkles className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  value={formData.displayName}
+                  onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
+                  placeholder="e.g. Alex Rivera"
+                  className="w-full pl-10 pr-4 py-2.5 bg-slate-900/90 border border-slate-750 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 rounded-2xl text-slate-100 placeholder-slate-500 outline-none text-sm transition"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Username */}
           <div>
-            <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">
-              {isRegister ? 'Username' : 'Username or Email'}
+            <label className="block text-xs font-semibold text-slate-300 mb-1">
+              Username
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
-                <User className="w-4 h-4" />
-              </div>
+              <User className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
                 required
                 value={formData.username}
                 onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                placeholder={isRegister ? 'e.g. alex' : 'Enter username or email'}
+                placeholder="e.g. alex"
                 className="w-full pl-10 pr-4 py-2.5 bg-slate-900/90 border border-slate-750 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 rounded-2xl text-slate-100 placeholder-slate-500 outline-none text-sm transition"
               />
             </div>
           </div>
 
+          {/* Email (for Register) */}
           {isRegister && (
-            <>
-              <div>
-                <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">
-                  Display Name
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
-                    <Sparkles className="w-4 h-4" />
-                  </div>
-                  <input
-                    type="text"
-                    value={formData.displayName}
-                    onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
-                    placeholder="e.g. Alex Johnson"
-                    className="w-full pl-10 pr-4 py-2.5 bg-slate-900/90 border border-slate-750 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 rounded-2xl text-slate-100 placeholder-slate-500 outline-none text-sm transition"
-                  />
-                </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 mb-1">
+                Email Address
+              </label>
+              <div className="relative">
+                <Mail className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="email"
+                  required
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  placeholder="alex@example.com"
+                  className="w-full pl-10 pr-4 py-2.5 bg-slate-900/90 border border-slate-750 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 rounded-2xl text-slate-100 placeholder-slate-500 outline-none text-sm transition"
+                />
               </div>
-
-              <div>
-                <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">
-                  Email Address
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
-                    <Mail className="w-4 h-4" />
-                  </div>
-                  <input
-                    type="email"
-                    required
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    placeholder="alex@example.com"
-                    className="w-full pl-10 pr-4 py-2.5 bg-slate-900/90 border border-slate-750 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 rounded-2xl text-slate-100 placeholder-slate-500 outline-none text-sm transition"
-                  />
-                </div>
-              </div>
-            </>
+            </div>
           )}
 
+          {/* Password */}
           <div>
-            <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+            <label className="block text-xs font-semibold text-slate-300 mb-1">
               Password
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
-                <Lock className="w-4 h-4" />
-              </div>
+              <Lock className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
                 type="password"
                 required
@@ -388,7 +440,7 @@ export const AuthModal = () => {
 
           <button
             type="submit"
-            disabled={isLoading || isUploadingAvatar}
+            disabled={isLoading || isUploadingAvatar || !!socialLoading}
             className="w-full mt-2 py-3 px-4 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 disabled:opacity-50 text-white font-bold rounded-2xl transition flex items-center justify-center gap-2 shadow-xl shadow-indigo-600/30 hover:scale-102 active:scale-98 cursor-pointer text-sm"
           >
             {isLoading || isUploadingAvatar ? (
@@ -429,6 +481,80 @@ export const AuthModal = () => {
           )}
         </div>
       </div>
+
+      {/* Social OAuth Profile Confirmation Modal */}
+      {socialModalProvider && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in select-none">
+          <div className="w-full max-w-sm bg-[#0f1422] border border-slate-800 rounded-3xl shadow-2xl p-6 flex flex-col animate-in zoom-in-95 shadow-indigo-950/30">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
+              <div className="flex items-center gap-2.5">
+                {socialModalProvider === 'google' ? <GoogleIcon /> : <GitHubIcon />}
+                <h3 className="text-sm font-bold text-white">
+                  Continue with {socialModalProvider === 'google' ? 'Google' : 'GitHub'}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSocialModalProvider(null)}
+                className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSocialSubmit} className="space-y-3.5">
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  Your Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={socialName}
+                  onChange={(e) => setSocialName(e.target.value)}
+                  placeholder="e.g. Alex Rivera"
+                  className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-750 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 rounded-xl text-slate-100 placeholder-slate-500 outline-none text-xs"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={socialEmail}
+                  onChange={(e) => setSocialEmail(e.target.value)}
+                  placeholder="user@example.com"
+                  className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-750 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 rounded-xl text-slate-100 placeholder-slate-500 outline-none text-xs"
+                />
+              </div>
+
+              <div className="flex items-center gap-2.5 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setSocialModalProvider(null)}
+                  className="flex-1 py-2.5 px-3 bg-slate-800 hover:bg-slate-750 text-slate-300 text-xs font-semibold rounded-xl transition cursor-pointer border border-slate-700"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={!!socialLoading}
+                  className="flex-1 py-2.5 px-3 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-bold rounded-xl transition cursor-pointer shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-1.5"
+                >
+                  {socialLoading ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <span>Sign In</span>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Live Camera Snapshot Modal */}
       <CameraCaptureModal
