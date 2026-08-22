@@ -1,76 +1,79 @@
-# 💬 Full-Stack WhatsApp Clone (Spring Boot + React + WebRTC)
+# ⚡ InstantPing — Real-Time Messaging & WebRTC Video Calling
 
-A modern, real-time messaging and peer-to-peer audio/video calling application modeled after WhatsApp Web.
-
----
-
-## ✨ Features
-
-- ⚡ **Real-Time 1-on-1 & Group Messaging**: Powered by Spring Boot WebSockets and STOMP message broker.
-- 📞 **Audio & Video Calling (WebRTC)**: High-definition 1-to-1 voice and video calling with signaling broker, camera toggles, mic mute, and screen sharing.
-- 🖼️ **Media & File Sharing**: High-resolution image preview lightbox, HTML5 video player, audio messages/voice notes, and document downloaders.
-- 👥 **Group Management**: Create custom groups, assign admins, add/remove participants, customize group icons and descriptions.
-- 🔒 **Secure Authentication**: JWT-based authentication, user presence tracking (online/offline indicators), and profile customization.
-- 🎨 **WhatsApp Web UI**: Sleek dark theme, emoji picker, read receipts (single ✓, double ✓✓, blue ticks), and typing status ("John is typing...").
-- 🔔 **Interactive Sound Effects**: Native Web Audio API synthesized message dings, outgoing ringing, and incoming melodic ringtones with zero extra audio asset dependencies.
+<div align="center">
+  <img src="frontend/public/favicon.svg" width="100" height="100" alt="InstantPing Logo" />
+  <h3>Fast, Secure, Real-Time Messaging & Multi-User Voice/Video Calling</h3>
+  <p>Live at: <strong><a href="https://chat.kanchan.online">https://chat.kanchan.online</a></strong></p>
+</div>
 
 ---
 
-## 🛠️ Tech Stack
+## 🌟 Highlights & Key Features
 
-### Backend
-- **Java 21 / 26**
-- **Spring Boot 3.3.4**
-- **Spring WebSocket & STOMP Broker**
-- **Spring Security & JJWT**
-- **Spring Data JPA & H2 File Database** (Persistent under `./backend/data/chatdb`)
-- **Maven**
-
-### Frontend
-- **React 18**
-- **Vite**
-- **Tailwind CSS v4**
-- **Lucide Icons**
-- **@stomp/stompjs & SockJS**
-- **Native Browser WebRTC (RTCPeerConnection)**
-- **Emoji Picker React**
-- **Axios & Date-fns**
+- ⚡ **Real-Time Messaging**: Built with Spring Boot WebSockets and STOMP message broker with instant message delivery, live typing alerts, and read receipts.
+- 📹 **HD WebRTC Video & Voice Calling**: Peer-to-peer 1-on-1 and multi-user group mesh voice and video calling with screen sharing, mic mute, and camera toggles.
+- 🎙️ **Interactive Waveform Voice Notes**: Custom-built audio message player with waveform progress visualization, scrubber, and `1x / 1.5x / 2x` speed toggles.
+- 🖼️ **Media & Attachment Sharing**: Photos, high-definition videos, documents, and live camera snapshot upload.
+- 👥 **Group Chat Management**: Create groups, assign admins, add/remove participants, and ongoing group call banners with seamless 1-click joining.
+- 📱 **Fully Responsive UI**: Mobile-optimized bottom navigation dock, full-screen conversation transitions, and desktop navigation rail.
+- 🎨 **Cyber-Dark Aesthetic**: Modern deep obsidian and electric indigo glassmorphism theme.
+- 🔔 **Synthesized Audio Effects**: Native Web Audio API tone synthesizer for zero-dependency incoming, outgoing, and message chimes.
+- 🔒 **Security & Authentication**: Stateless JWT authentication, BCrypt password hashing, and SSL/HTTPS encryption.
+- 🚀 **Automated CI/CD**: Fully automated GitHub Actions workflow building and deploying to production via Docker on every push to `main`.
 
 ---
 
-## 🚀 How to Run
+## 🛠️ Complete Technical Stack
 
-### Option 1: Quick Launch (Windows)
-Double-click `run-app.bat` or run in PowerShell:
-```powershell
-.\run-app.ps1
-```
+| Layer | Technologies Used |
+| :--- | :--- |
+| **Frontend** | React 18, Vite, Tailwind CSS v4, @stomp/stompjs, SockJS, WebRTC API, Web Audio API, Lucide Icons, Axios, Date-fns |
+| **Backend** | Java 21, Spring Boot 3.3.4, Spring WebSocket/STOMP, Spring Security 6, JJWT, Spring Data JPA, H2 Database (File Mode), Maven |
+| **DevOps** | Docker, Docker Compose, Nginx (Reverse Proxy), Certbot (Let's Encrypt SSL), GitHub Actions (CI/CD) |
 
-### Option 2: Manual Run
+For complete in-depth technical documentation, system design diagrams, entity schemas, and signaling workflows, see:
+👉 **[ARCHITECTURE.md](./ARCHITECTURE.md)**
 
-#### 1. Start Backend:
+---
+
+## 🚀 Quick Start (Local Development)
+
+### Prerequisites
+- JDK 21+
+- Node.js 20+
+- Maven
+
+### Run Locally
+
+1. **Start Backend**:
 ```bash
 cd backend
 mvn spring-boot:run
 ```
-Backend starts on **`http://localhost:8080`**.
-H2 Database console: **`http://localhost:8080/h2-console`** (JDBC URL: `jdbc:h2:file:./data/chatdb`).
+*Backend runs on `http://localhost:8080` (H2 Console: `http://localhost:8080/h2-console`).*
 
-#### 2. Start Frontend:
+2. **Start Frontend**:
 ```bash
 cd frontend
+npm install
 npm run dev
 ```
-Frontend runs on **`http://localhost:5173`**.
+*Frontend runs on `http://localhost:5173`.*
 
 ---
 
-## 🧪 Testing Multi-User Chatting & Calling
+## 🐳 Production Deployment (Docker Compose)
 
-1. Open `http://localhost:5173` in a regular browser window and register **User 1** (e.g. `alice`).
-2. Open `http://localhost:5173` in an **Incognito** window and register **User 2** (e.g. `bob`).
-3. In Alice's window, click the **New Direct Chat** icon (`+`) and select **Bob**.
-4. Send messages, emojis, images, and videos in real time.
-5. Click the **Video Call** or **Voice Call** icon in the header:
-   - Bob will receive an animated incoming call modal with a melodic ringtone.
-   - Click **Accept** to connect the WebRTC audio & video streams!
+```bash
+# Clone the repository
+git clone https://github.com/kanchan-11/whatsapp-plus.git instantping
+cd instantping
+
+# Start the full stack with Docker Compose
+docker compose up --build -d
+```
+
+---
+
+## 📄 License
+This project is open-source under the MIT License.
