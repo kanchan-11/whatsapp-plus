@@ -9,7 +9,6 @@ public class SocialLoginRequest {
 
     private String email;
 
-    @NotBlank(message = "Display name is required")
     private String name;
 
     private String avatarUrl;

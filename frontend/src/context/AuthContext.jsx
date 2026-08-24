@@ -52,6 +52,11 @@ export const AuthProvider = ({ children }) => {
   };
 
   const socialLogin = async (socialData) => {
+    if (socialData && socialData.token && socialData.user) {
+      setUser(socialData.user);
+      setToken(socialData.token);
+      return socialData;
+    }
     const data = await authService.socialLogin(socialData);
     setUser(data.user);
     setToken(data.token);

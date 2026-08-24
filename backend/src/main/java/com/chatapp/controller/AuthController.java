@@ -38,6 +38,12 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/oauth/github")
+    public ResponseEntity<AuthResponse> githubOAuth(@Valid @RequestBody com.chatapp.dto.GithubOAuthRequest request) {
+        AuthResponse response = userService.githubOAuthLogin(request);
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/me")
     public ResponseEntity<UserDto> getCurrentUser() {
         return ResponseEntity.ok(userService.getCurrentUser());

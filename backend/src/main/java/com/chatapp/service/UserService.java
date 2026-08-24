@@ -22,6 +22,12 @@ import java.util.stream.Collectors;
 @Service
 public class UserService {
 
+    @org.springframework.beans.factory.annotation.Value("${app.oauth.github.client-id:}")
+    private String githubClientId;
+
+    @org.springframework.beans.factory.annotation.Value("${app.oauth.github.client-secret:}")
+    private String githubClientSecret;
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
@@ -82,11 +88,15 @@ public class UserService {
                 ? request.getEmail().trim().toLowerCase()
                 : null;
 
+        String rawName = request.getName() != null && !request.getName().isBlank()
+                ? request.getName().trim()
+                : (email != null && email.contains("@") ? email.substring(0, email.indexOf('@')) : request.getProvider() + "_user");
+
         String baseUsername;
         if (email != null && email.contains("@")) {
             baseUsername = email.substring(0, email.indexOf('@')).replaceAll("[^a-zA-Z0-9_]", "");
         } else {
-            baseUsername = request.getName().toLowerCase().replaceAll("[^a-zA-Z0-9_]", "");
+            baseUsername = rawName.toLowerCase().replaceAll("[^a-zA-Z0-9_]", "");
         }
         if (baseUsername.isBlank()) {
             baseUsername = request.getProvider().toLowerCase() + "_user";
@@ -94,10 +104,10 @@ public class UserService {
 
         User user = null;
         if (email != null) {
-            user = userRepository.findByEmail(email).orElse(null);
+            user = userRepository.findByEmailIgnoreCase(email).orElse(null);
         }
         if (user == null) {
-            user = userRepository.findByUsername(baseUsername).orElse(null);
+            user = userRepository.findByUsernameIgnoreCase(baseUsername).orElse(null);
         }
 
         if (user == null) {
@@ -105,13 +115,23 @@ public class UserService {
             user = new User();
             String uniqueUsername = baseUsername;
             int counter = 1;
-            while (userRepository.existsByUsername(uniqueUsername)) {
+            while (userRepository.existsByUsernameIgnoreCase(uniqueUsername)) {
                 uniqueUsername = baseUsername + counter++;
             }
+
+            String uniqueEmail = email;
+            if (uniqueEmail == null || uniqueEmail.isBlank()) {
+                uniqueEmail = uniqueUsername.toLowerCase() + "@" + request.getProvider().toLowerCase() + ".oauth";
+                int emailCounter = 1;
+                while (userRepository.existsByEmailIgnoreCase(uniqueEmail)) {
+                    uniqueEmail = uniqueUsername.toLowerCase() + emailCounter++ + "@" + request.getProvider().toLowerCase() + ".oauth";
+                }
+            }
+
             user.setUsername(uniqueUsername);
-            user.setEmail(email != null ? email : uniqueUsername + "@" + request.getProvider().toLowerCase() + ".oauth");
+            user.setEmail(uniqueEmail);
             user.setPassword(passwordEncoder.encode(java.util.UUID.randomUUID().toString()));
-            user.setDisplayName(request.getName().trim());
+            user.setDisplayName(rawName);
             user.setAvatarUrl(request.getAvatarUrl() != null && !request.getAvatarUrl().isBlank()
                     ? request.getAvatarUrl()
                     : "https://api.dicebear.com/7.x/bottts/svg?seed=" + uniqueUsername);
@@ -123,9 +143,7 @@ public class UserService {
             if (request.getAvatarUrl() != null && !request.getAvatarUrl().isBlank()) {
                 user.setAvatarUrl(request.getAvatarUrl());
             }
-            if (request.getName() != null && !request.getName().isBlank()) {
-                user.setDisplayName(request.getName().trim());
-            }
+            user.setDisplayName(rawName);
             user.setOnline(true);
             user.setLastSeen(LocalDateTime.now());
             user = userRepository.save(user);
@@ -133,6 +151,119 @@ public class UserService {
 
         String token = jwtService.generateToken(user.getUsername(), user.getId());
         return new AuthResponse(token, toDto(user));
+    }
+
+    @Transactional
+    public AuthResponse githubOAuthLogin(com.chatapp.dto.GithubOAuthRequest request) {
+        if (githubClientSecret == null || githubClientSecret.isBlank()) {
+            throw new BadRequestException("GitHub OAuth Client Secret is not configured on the backend. Please set GITHUB_CLIENT_SECRET in your backend environment or application.yml.");
+        }
+
+        try {
+            org.springframework.web.client.RestTemplate restTemplate = new org.springframework.web.client.RestTemplate();
+
+            // 1. Exchange code for access token
+            org.springframework.http.HttpHeaders tokenHeaders = new org.springframework.http.HttpHeaders();
+            tokenHeaders.setAccept(java.util.List.of(org.springframework.http.MediaType.APPLICATION_JSON));
+            tokenHeaders.setContentType(org.springframework.http.MediaType.APPLICATION_JSON);
+
+            java.util.Map<String, String> tokenBody = new java.util.HashMap<>();
+            tokenBody.put("client_id", githubClientId);
+            tokenBody.put("client_secret", githubClientSecret);
+            tokenBody.put("code", request.getCode());
+            if (request.getRedirectUri() != null) {
+                tokenBody.put("redirect_uri", request.getRedirectUri());
+            }
+
+            org.springframework.http.HttpEntity<java.util.Map<String, String>> tokenEntity = 
+                    new org.springframework.http.HttpEntity<>(tokenBody, tokenHeaders);
+
+            @SuppressWarnings("unchecked")
+            java.util.Map<String, Object> tokenRes = restTemplate.postForObject(
+                    "https://github.com/login/oauth/access_token",
+                    tokenEntity,
+                    java.util.Map.class
+            );
+
+            if (tokenRes == null || !tokenRes.containsKey("access_token")) {
+                String errorDesc = tokenRes != null && tokenRes.containsKey("error_description") 
+                        ? (String) tokenRes.get("error_description") 
+                        : "Failed to exchange GitHub authorization code";
+                throw new BadRequestException(errorDesc);
+            }
+
+            String accessToken = (String) tokenRes.get("access_token");
+
+            // 2. Fetch user profile from GitHub API
+            org.springframework.http.HttpHeaders userHeaders = new org.springframework.http.HttpHeaders();
+            userHeaders.setBearerAuth(accessToken);
+            userHeaders.set("User-Agent", "InstantPing-App");
+            org.springframework.http.HttpEntity<Void> userEntity = new org.springframework.http.HttpEntity<>(userHeaders);
+
+            @SuppressWarnings("unchecked")
+            java.util.Map<String, Object> githubUser = restTemplate.exchange(
+                    "https://api.github.com/user",
+                    org.springframework.http.HttpMethod.GET,
+                    userEntity,
+                    java.util.Map.class
+            ).getBody();
+
+            if (githubUser == null) {
+                throw new BadRequestException("Could not retrieve GitHub user profile");
+            }
+
+            String login = (String) githubUser.get("login");
+            String name = (String) githubUser.get("name");
+            String email = (String) githubUser.get("email");
+            String avatarUrl = (String) githubUser.get("avatar_url");
+            Object idObj = githubUser.get("id");
+            String providerId = idObj != null ? String.valueOf(idObj) : String.valueOf(System.currentTimeMillis());
+
+            // 3. If primary email is private, fetch from /user/emails
+            if (email == null || email.isBlank()) {
+                try {
+                    @SuppressWarnings("rawtypes")
+                    org.springframework.http.ResponseEntity<java.util.List> emailsRes = restTemplate.exchange(
+                            "https://api.github.com/user/emails",
+                            org.springframework.http.HttpMethod.GET,
+                            userEntity,
+                            java.util.List.class
+                    );
+                    if (emailsRes.getBody() != null) {
+                        for (Object o : emailsRes.getBody()) {
+                            if (o instanceof java.util.Map) {
+                                @SuppressWarnings("unchecked")
+                                java.util.Map<String, Object> emailMap = (java.util.Map<String, Object>) o;
+                                Boolean primary = (Boolean) emailMap.get("primary");
+                                if (Boolean.TRUE.equals(primary)) {
+                                    email = (String) emailMap.get("email");
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                } catch (Exception ignored) {
+                }
+            }
+
+            if (email == null || email.isBlank()) {
+                email = login.toLowerCase() + "@github.oauth";
+            }
+
+            com.chatapp.dto.SocialLoginRequest socialReq = new com.chatapp.dto.SocialLoginRequest(
+                    "github",
+                    email,
+                    name != null && !name.isBlank() ? name : login,
+                    avatarUrl,
+                    providerId
+            );
+
+            return socialLogin(socialReq);
+        } catch (BadRequestException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BadRequestException("GitHub OAuth authentication failed: " + e.getMessage());
+        }
     }
 
     public User getCurrentUserEntity() {
