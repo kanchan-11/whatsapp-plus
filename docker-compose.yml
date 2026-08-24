@@ -9,6 +9,8 @@ services:
     restart: always
     environment:
       - SPRING_PROFILES_ACTIVE=prod
+      - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID:-}
+      - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET:-}
     volumes:
       - app-data:/app/data
       - app-uploads:/app/uploads

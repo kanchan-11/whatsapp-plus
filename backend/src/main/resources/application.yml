@@ -39,5 +39,5 @@ app:
     dir: ./uploads
   oauth:
     github:
-      client-id: Ov23liEYagYJBN7s0Nou
-      client-secret: 135d669c9093517471566894090b0c8c5219dc17
+      client-id: ${GITHUB_CLIENT_ID:}
+      client-secret: ${GITHUB_CLIENT_SECRET:}
