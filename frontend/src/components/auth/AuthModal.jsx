@@ -15,7 +15,6 @@ import {
   ChevronDown, 
   Plus, 
   Check, 
-  Zap, 
   X 
 } from 'lucide-react';
 
@@ -77,24 +76,6 @@ export const AuthModal = () => {
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const fileInputRef = useRef(null);
   const dropdownRef = useRef(null);
-
-  const demoAccounts = [
-    { name: 'Demo User', username: 'user', pass: 'password123' },
-    { name: 'Alice', username: 'alice', pass: 'password123' },
-    { name: 'Bob', username: 'bob', pass: 'password123' },
-  ];
-
-  const handleQuickLogin = async (username) => {
-    setError('');
-    setIsLoading(true);
-    try {
-      await login({ usernameOrEmail: username, password: 'password123' });
-    } catch (err) {
-      setError(err.response?.data?.message || 'Login failed');
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   // Direct Google Sign In (Triggers Google's Official OAuth Account Chooser)
   const handleGoogleSignIn = async () => {
@@ -234,32 +215,10 @@ export const AuthModal = () => {
         <div className="flex items-center gap-3 my-4">
           <div className="flex-1 h-[1px] bg-slate-800"></div>
           <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-            Or continue with
+            Or with email & password
           </span>
           <div className="flex-1 h-[1px] bg-slate-800"></div>
         </div>
-
-        {/* Quick Demo Login Bar */}
-        {!isRegister && (
-          <div className="mb-4 bg-slate-900/80 border border-slate-800 p-3 rounded-2xl">
-            <div className="flex items-center gap-1.5 text-xs text-indigo-400 font-semibold mb-2">
-              <Zap className="w-3.5 h-3.5" /> 1-Click Demo Logins:
-            </div>
-            <div className="grid grid-cols-3 gap-2">
-              {demoAccounts.map((acc) => (
-                <button
-                  key={acc.username}
-                  type="button"
-                  onClick={() => handleQuickLogin(acc.username)}
-                  className="py-1.5 px-2 bg-slate-800/80 hover:bg-indigo-600 hover:text-white border border-slate-750 rounded-xl text-xs font-semibold text-slate-200 transition cursor-pointer text-center truncate shadow-xs"
-                  title={`Login as ${acc.name} (${acc.username})`}
-                >
-                  {acc.name.split(' ')[0]}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
 
         {error && (
           <div className="mb-4 p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-400 text-xs text-center font-medium">
