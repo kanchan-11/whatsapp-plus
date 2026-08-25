@@ -44,4 +44,14 @@ public class MessageController {
         messageService.markChatMessagesAsRead(chatId, currentUser);
         return ResponseEntity.ok(Map.of("message", "Messages marked as read"));
     }
+
+    @PostMapping("/{messageId}/reactions")
+    public ResponseEntity<MessageDto> toggleReaction(
+            @PathVariable Long messageId,
+            @Valid @RequestBody com.chatapp.dto.ReactionRequest request
+    ) {
+        User currentUser = userService.getCurrentUserEntity();
+        MessageDto updated = messageService.toggleReaction(messageId, request.getEmoji(), currentUser);
+        return ResponseEntity.ok(updated);
+    }
 }

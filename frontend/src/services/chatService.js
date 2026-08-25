@@ -41,6 +41,11 @@ export const chatService = {
     return res.data;
   },
 
+  async toggleReaction(messageId, emoji) {
+    const res = await api.post(`/messages/${messageId}/reactions`, { emoji });
+    return res.data;
+  },
+
   async uploadFile(file) {
     const formData = new FormData();
     formData.append('file', file);
