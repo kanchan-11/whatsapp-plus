@@ -7,8 +7,11 @@ import {
   Download, 
   Play, 
   Pause, 
-  Mic
+  Smile,
+  Reply
 } from 'lucide-react';
+
+const QUICK_EMOJIS = ['👍', '❤️', '😂', '😮', '😢', '🔥', '🎉'];
 
 const CustomAudioPlayer = ({ src, isMe }) => {
   const audioRef = useRef(null);
@@ -173,8 +176,22 @@ const CustomAudioPlayer = ({ src, isMe }) => {
   );
 };
 
-export const MessageBubble = ({ message, currentUserId, isGroup, onOpenMedia }) => {
+export const MessageBubble = ({ message, currentUserId, isGroup, onOpenMedia, onToggleReaction, onReply }) => {
   const isMe = message.sender?.id === currentUserId;
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const pickerRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (pickerRef.current && !pickerRef.current.contains(e.target)) {
+        setShowEmojiPicker(false);
+      }
+    };
+    if (showEmojiPicker) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showEmojiPicker]);
 
   const formatTime = (dateStr) => {
     if (!dateStr) return '';
@@ -198,10 +215,68 @@ export const MessageBubble = ({ message, currentUserId, isGroup, onOpenMedia }) 
     return colors[(id || 0) % colors.length];
   };
 
+  const handleSelectEmoji = (emoji) => {
+    setShowEmojiPicker(false);
+    if (onToggleReaction && message?.id) {
+      onToggleReaction(message.id, emoji);
+    }
+  };
+
   return (
-    <div className={`flex flex-col mb-1.5 ${isMe ? 'items-end' : 'items-start'}`}>
+    <div
+      id={`msg-${message.id}`}
+      className={`group/bubble flex flex-col mb-1.5 relative ${isMe ? 'items-end' : 'items-start'}`}
+    >
+      {/* Floating Action Bar on Hover */}
       <div
-        className={`relative max-w-[85%] md:max-w-[65%] rounded-2xl px-4 py-2.5 shadow-sm transition ${
+        className={`absolute top-0 -translate-y-1/2 opacity-0 group-hover/bubble:opacity-100 transition-opacity z-20 flex items-center gap-1.5 ${
+          isMe ? 'right-2' : 'left-2'
+        }`}
+      >
+        <button
+          type="button"
+          onClick={() => onReply && onReply(message)}
+          className="p-1.5 rounded-full bg-slate-900/90 border border-slate-750 text-slate-300 hover:text-white hover:scale-110 shadow-lg cursor-pointer backdrop-blur-md transition"
+          title="Reply to message"
+        >
+          <Reply className="w-3.5 h-3.5" />
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setShowEmojiPicker((prev) => !prev)}
+          className="p-1.5 rounded-full bg-slate-900/90 border border-slate-750 text-slate-300 hover:text-white hover:scale-110 shadow-lg cursor-pointer backdrop-blur-md transition"
+          title="React to message"
+        >
+          <Smile className="w-3.5 h-3.5" />
+        </button>
+      </div>
+
+      {/* Floating Quick Emoji Picker Popup */}
+      {showEmojiPicker && (
+        <div
+          ref={pickerRef}
+          className={`absolute -top-11 z-30 flex items-center gap-1.5 px-2 py-1.5 bg-[#0f172a]/95 border border-slate-700/80 rounded-full shadow-2xl backdrop-blur-xl animate-in zoom-in-95 ${
+            isMe ? 'right-0' : 'left-0'
+          }`}
+        >
+          {QUICK_EMOJIS.map((emoji) => (
+            <button
+              key={emoji}
+              type="button"
+              onClick={() => handleSelectEmoji(emoji)}
+              className="w-8 h-8 flex items-center justify-center text-base rounded-full hover:bg-slate-800/90 hover:scale-125 active:scale-95 transition-all cursor-pointer"
+            >
+              {emoji}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Message Bubble Container */}
+      <div
+        id={`msg-card-${message.id}`}
+        className={`relative max-w-[85%] md:max-w-[65%] rounded-2xl px-4 py-2.5 shadow-sm transition-all duration-300 ${
           isMe
             ? 'bg-gradient-to-br from-indigo-600 via-indigo-600 to-violet-600 text-white rounded-tr-xs shadow-indigo-950/40 border border-indigo-500/30'
             : 'bg-[#161d2d] border border-slate-800 text-slate-100 rounded-tl-xs shadow-slate-950/30'
@@ -212,6 +287,31 @@ export const MessageBubble = ({ message, currentUserId, isGroup, onOpenMedia }) 
           <p className={`text-xs font-bold mb-1 tracking-wide ${getUserColor(message.sender.id)}`}>
             {message.sender.displayName || message.sender.username}
           </p>
+        )}
+
+        {/* Quoted Parent Message (Click to Jump) */}
+        {message.replyTo && (
+          <div
+            onClick={() => {
+              const card = document.getElementById(`msg-card-${message.replyTo.id}`);
+              if (card) {
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                card.classList.add('ring-4', 'ring-indigo-400/80', 'shadow-2xl', 'shadow-indigo-500/50', 'scale-[1.02]');
+                setTimeout(() => {
+                  card.classList.remove('ring-4', 'ring-indigo-400/80', 'shadow-2xl', 'shadow-indigo-500/50', 'scale-[1.02]');
+                }, 1400);
+              }
+            }}
+            className="mb-2 p-2 rounded-xl bg-black/25 border-l-4 border-indigo-400 cursor-pointer hover:bg-black/35 transition text-left select-none"
+            title="Click to jump to original message"
+          >
+            <p className="text-[11px] font-bold text-indigo-300 truncate">
+              {message.replyTo.senderName || 'Message'}
+            </p>
+            <p className="text-xs text-slate-300 truncate line-clamp-1">
+              {message.replyTo.content || (message.replyTo.type === 'AUDIO' ? '🎵 Voice note' : '📷 Attachment')}
+            </p>
+          </div>
         )}
 
         {/* Media Attachments */}
@@ -314,6 +414,28 @@ export const MessageBubble = ({ message, currentUserId, isGroup, onOpenMedia }) 
           )}
         </div>
       </div>
+
+      {/* Reaction Badges Below Message */}
+      {message.reactions && message.reactions.length > 0 && (
+        <div className={`flex flex-wrap items-center gap-1.5 mt-1.5 pb-0.5 z-10 ${isMe ? 'justify-end pr-1' : 'justify-start pl-1'}`}>
+          {message.reactions.map((r, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => onToggleReaction && onToggleReaction(message.id, r.emoji)}
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border transition cursor-pointer hover:scale-105 active:scale-95 shadow-sm ${
+                r.reactedByMe
+                  ? 'bg-indigo-600/30 border-indigo-500 text-indigo-200 shadow-indigo-500/20'
+                  : 'bg-slate-900/90 border-slate-750 text-slate-300 hover:bg-slate-800'
+              }`}
+              title={r.users?.map((u) => u.displayName || u.username).join(', ') || ''}
+            >
+              <span className="text-sm leading-none">{r.emoji}</span>
+              <span className="text-[11px] font-bold leading-none">{r.count}</span>
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

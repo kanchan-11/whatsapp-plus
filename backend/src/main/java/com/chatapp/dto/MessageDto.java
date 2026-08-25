@@ -14,6 +14,8 @@ public class MessageDto {
     private MessageType type;
     private MessageStatus status;
     private List<AttachmentDto> attachments = new ArrayList<>();
+    private List<ReactionDto> reactions = new ArrayList<>();
+    private ReplyMessageDto replyTo;
     private LocalDateTime createdAt;
 
     public MessageDto() {}
@@ -38,6 +40,12 @@ public class MessageDto {
 
     public List<AttachmentDto> getAttachments() { return attachments; }
     public void setAttachments(List<AttachmentDto> attachments) { this.attachments = attachments; }
+
+    public List<ReactionDto> getReactions() { return reactions; }
+    public void setReactions(List<ReactionDto> reactions) { this.reactions = reactions; }
+
+    public ReplyMessageDto getReplyTo() { return replyTo; }
+    public void setReplyTo(ReplyMessageDto replyTo) { this.replyTo = replyTo; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

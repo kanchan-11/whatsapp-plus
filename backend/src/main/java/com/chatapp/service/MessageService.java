@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,6 +32,7 @@ public class MessageService {
     private final MessageRepository messageRepository;
     private final ChatRepository chatRepository;
     private final GroupMemberRepository groupMemberRepository;
+    private final com.chatapp.repository.MessageReactionRepository messageReactionRepository;
     private final UserService userService;
     private final ChatService chatService;
     private final SimpMessagingTemplate messagingTemplate;
@@ -39,6 +41,7 @@ public class MessageService {
             MessageRepository messageRepository,
             ChatRepository chatRepository,
             GroupMemberRepository groupMemberRepository,
+            com.chatapp.repository.MessageReactionRepository messageReactionRepository,
             UserService userService,
             @Lazy ChatService chatService,
             SimpMessagingTemplate messagingTemplate
@@ -46,6 +49,7 @@ public class MessageService {
         this.messageRepository = messageRepository;
         this.chatRepository = chatRepository;
         this.groupMemberRepository = groupMemberRepository;
+        this.messageReactionRepository = messageReactionRepository;
         this.userService = userService;
         this.chatService = chatService;
         this.messagingTemplate = messagingTemplate;
@@ -81,6 +85,14 @@ public class MessageService {
             }
         }
 
+        if (request.getReplyToId() != null) {
+            messageRepository.findById(request.getReplyToId()).ifPresent(parent -> {
+                if (parent.getChat() != null && parent.getChat().getId().equals(chat.getId())) {
+                    message.setParentMessage(parent);
+                }
+            });
+        }
+
         Message saved = messageRepository.save(message);
 
         // Update chat last message and time
@@ -114,7 +126,7 @@ public class MessageService {
 
         List<Message> messages = messageRepository.findByChatIdOrderByCreatedAtAsc(chatId);
         return messages.stream()
-                .map(this::toDto)
+                .map(m -> this.toDto(m, currentUser))
                 .collect(Collectors.toList());
     }
 
@@ -136,7 +148,39 @@ public class MessageService {
         }
     }
 
+    @Transactional
+    public MessageDto toggleReaction(Long messageId, String emoji, User currentUser) {
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new ResourceNotFoundException("Message not found with id: " + messageId));
+
+        boolean isMember = groupMemberRepository.existsByChatIdAndUserId(message.getChat().getId(), currentUser.getId());
+        if (!isMember) {
+            throw new UnauthorizedException("You are not a member of this chat");
+        }
+
+        var existingOpt = messageReactionRepository.findByMessageIdAndUserIdAndEmoji(messageId, currentUser.getId(), emoji);
+        if (existingOpt.isPresent()) {
+            messageReactionRepository.deleteByMessageIdAndUserIdAndEmoji(messageId, currentUser.getId(), emoji);
+        } else {
+            com.chatapp.model.MessageReaction reaction = new com.chatapp.model.MessageReaction(message, currentUser, emoji);
+            messageReactionRepository.save(reaction);
+        }
+
+        // Fetch fresh message entity with updated reactions
+        Message freshMessage = messageRepository.findById(messageId).orElse(message);
+        MessageDto dto = toDto(freshMessage, currentUser);
+
+        // Broadcast reaction update to chat subscribers
+        messagingTemplate.convertAndSend("/topic/chat." + message.getChat().getId() + ".reactions", dto);
+
+        return dto;
+    }
+
     public MessageDto toDto(Message message) {
+        return toDto(message, null);
+    }
+
+    public MessageDto toDto(Message message, User currentUser) {
         if (message == null) return null;
 
         MessageDto dto = new MessageDto();
@@ -160,6 +204,49 @@ public class MessageService {
                     ))
                     .collect(Collectors.toList());
             dto.setAttachments(attachmentDtos);
+        }
+
+        List<com.chatapp.model.MessageReaction> reactions = messageReactionRepository.findByMessageId(message.getId());
+        if (reactions != null && !reactions.isEmpty()) {
+            java.util.Map<String, List<com.chatapp.model.MessageReaction>> grouped = reactions.stream()
+                    .collect(Collectors.groupingBy(com.chatapp.model.MessageReaction::getEmoji));
+
+            List<com.chatapp.dto.ReactionDto> reactionDtos = new ArrayList<>();
+            for (var entry : grouped.entrySet()) {
+                String emoji = entry.getKey();
+                List<com.chatapp.model.MessageReaction> reactionList = entry.getValue();
+                List<com.chatapp.dto.UserDto> userDtos = reactionList.stream()
+                        .map(r -> userService.toDto(r.getUser()))
+                        .collect(Collectors.toList());
+
+                boolean reactedByMe = currentUser != null && reactionList.stream()
+                        .anyMatch(r -> r.getUser().getId().equals(currentUser.getId()));
+
+                reactionDtos.add(new com.chatapp.dto.ReactionDto(
+                        emoji,
+                        reactionList.size(),
+                        userDtos,
+                        reactedByMe
+                ));
+            }
+            dto.setReactions(reactionDtos);
+        }
+
+        if (message.getParentMessage() != null) {
+            Message parent = message.getParentMessage();
+            String senderName = parent.getSender() != null
+                    ? (parent.getSender().getDisplayName() != null && !parent.getSender().getDisplayName().isBlank()
+                            ? parent.getSender().getDisplayName()
+                            : parent.getSender().getUsername())
+                    : "System";
+            Long senderId = parent.getSender() != null ? parent.getSender().getId() : null;
+            dto.setReplyTo(new com.chatapp.dto.ReplyMessageDto(
+                    parent.getId(),
+                    senderId,
+                    senderName,
+                    parent.getContent(),
+                    parent.getType()
+            ));
         }
 
         return dto;

@@ -16,6 +16,8 @@ public class SendMessageRequest {
 
     private List<AttachmentDto> attachments = new ArrayList<>();
 
+    private Long replyToId;
+
     public SendMessageRequest() {}
 
     public Long getChatId() { return chatId; }
@@ -29,4 +31,7 @@ public class SendMessageRequest {
 
     public List<AttachmentDto> getAttachments() { return attachments; }
     public void setAttachments(List<AttachmentDto> attachments) { this.attachments = attachments; }
+
+    public Long getReplyToId() { return replyToId; }
+    public void setReplyToId(Long replyToId) { this.replyToId = replyToId; }
 }

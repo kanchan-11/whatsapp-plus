@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { isSameDay, format } from 'date-fns';
 import { MessageBubble } from './MessageBubble';
 
-export const MessageList = ({ messages, currentUserId, isGroup, onOpenMedia }) => {
+export const MessageList = ({ messages, currentUserId, isGroup, onOpenMedia, onToggleReaction, onReply }) => {
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -45,6 +45,8 @@ export const MessageList = ({ messages, currentUserId, isGroup, onOpenMedia }) =
               currentUserId={currentUserId}
               isGroup={isGroup}
               onOpenMedia={onOpenMedia}
+              onToggleReaction={onToggleReaction}
+              onReply={onReply}
             />
           </React.Fragment>
         );

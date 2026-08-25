@@ -27,6 +27,7 @@ export const ChatArea = ({
   const [typingUsers, setTypingUsers] = useState([]);
   const [activeMedia, setActiveMedia] = useState(null);
   const [isGroupInfoOpen, setIsGroupInfoOpen] = useState(false);
+  const [replyingTo, setReplyingTo] = useState(null);
 
   const activeCallInGroup = chat?.type === 'GROUP' ? activeGroupCalls[chat.id] : null;
   const isAlreadyInThisCall = isGroupCall && groupInfo?.id === chat?.id;
@@ -35,6 +36,7 @@ export const ChatArea = ({
   useEffect(() => {
     if (!chat?.id) {
       setMessages([]);
+      setReplyingTo(null);
       return;
     }
 
@@ -53,6 +55,7 @@ export const ChatArea = ({
 
     fetchMessages();
     setTypingUsers([]);
+    setReplyingTo(null);
   }, [chat?.id]);
 
   // Subscribe to real-time chat updates via WebSocket
@@ -122,12 +125,75 @@ export const ChatArea = ({
       }
     });
 
+    // 4. Subscribe to message reactions
+    const reactionsSub = subscribe(`/topic/chat.${chat.id}.reactions`, (frame) => {
+      try {
+        const updatedMsg = JSON.parse(frame.body);
+        setMessages((prev) => prev.map((m) => (m.id === updatedMsg.id ? updatedMsg : m)));
+      } catch (err) {
+        console.error('Failed to parse reaction update', err);
+      }
+    });
+
     return () => {
       messageSub.unsubscribe();
       statusSub.unsubscribe();
       typingSub.unsubscribe();
+      reactionsSub.unsubscribe();
     };
   }, [chat?.id, subscribe, user?.id, onNewMessageReceived]);
+
+  const handleToggleReaction = async (messageId, emoji) => {
+    // 1. Optimistic UI update
+    setMessages((prev) =>
+      prev.map((m) => {
+        if (m.id !== messageId) return m;
+        const currentReactions = m.reactions ? [...m.reactions] : [];
+        const existingIdx = currentReactions.findIndex((r) => r.emoji === emoji);
+
+        if (existingIdx >= 0) {
+          const existing = currentReactions[existingIdx];
+          if (existing.reactedByMe) {
+            if (existing.count <= 1) {
+              currentReactions.splice(existingIdx, 1);
+            } else {
+              currentReactions[existingIdx] = {
+                ...existing,
+                count: existing.count - 1,
+                reactedByMe: false,
+                users: existing.users?.filter((u) => u.id !== user?.id) || [],
+              };
+            }
+          } else {
+            currentReactions[existingIdx] = {
+              ...existing,
+              count: existing.count + 1,
+              reactedByMe: true,
+              users: [...(existing.users || []), user],
+            };
+          }
+        } else {
+          currentReactions.push({
+            emoji,
+            count: 1,
+            reactedByMe: true,
+            users: [user],
+          });
+        }
+        return { ...m, reactions: currentReactions };
+      })
+    );
+
+    // 2. Call backend
+    try {
+      const updatedMsg = await chatService.toggleReaction(messageId, emoji);
+      if (updatedMsg) {
+        setMessages((prev) => prev.map((m) => (m.id === updatedMsg.id ? updatedMsg : m)));
+      }
+    } catch (err) {
+      console.error('Failed to toggle reaction', err);
+    }
+  };
 
   const handleSendMessage = async (msgData) => {
     try {
@@ -136,7 +202,9 @@ export const ChatArea = ({
         content: msgData.content,
         type: msgData.type,
         attachments: msgData.attachments,
+        replyToId: msgData.replyToId,
       });
+      setReplyingTo(null);
     } catch (err) {
       console.error('Failed to send message', err);
       alert('Could not send message. Please try again.');
@@ -240,6 +308,8 @@ export const ChatArea = ({
           currentUserId={user?.id}
           isGroup={chat.type === 'GROUP'}
           onOpenMedia={(media) => setActiveMedia(media)}
+          onToggleReaction={handleToggleReaction}
+          onReply={(msg) => setReplyingTo(msg)}
         />
       )}
 
@@ -247,6 +317,8 @@ export const ChatArea = ({
       <MessageInput
         onSendMessage={handleSendMessage}
         onTyping={handleTyping}
+        replyingTo={replyingTo}
+        onCancelReply={() => setReplyingTo(null)}
       />
 
       {/* Fullscreen Lightbox */}

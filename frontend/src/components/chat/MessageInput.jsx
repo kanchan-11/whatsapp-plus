@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import { chatService } from '../../services/chatService';
 
-export const MessageInput = ({ onSendMessage, onTyping }) => {
+export const MessageInput = ({ onSendMessage, onTyping, replyingTo, onCancelReply }) => {
   const [text, setText] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showAttachMenu, setShowAttachMenu] = useState(false);
@@ -150,11 +150,13 @@ export const MessageInput = ({ onSendMessage, onTyping }) => {
       content: text.trim(),
       type: messageType,
       attachments,
+      replyToId: replyingTo?.id || null,
     });
 
     setText('');
     setPreviewAttachment(null);
     setShowEmojiPicker(false);
+    if (onCancelReply) onCancelReply();
     if (onTyping) onTyping(false);
   };
 
@@ -167,6 +169,28 @@ export const MessageInput = ({ onSendMessage, onTyping }) => {
 
   return (
     <div className="bg-[#0f1422] px-3 sm:px-5 py-2 sm:py-3 relative border-t border-slate-800/80 shrink-0">
+      {/* Quoted Reply Preview Banner */}
+      {replyingTo && (
+        <div className="mb-2 p-2.5 bg-slate-900/95 rounded-2xl border-l-4 border-indigo-500 border-t border-r border-b border-slate-800 flex items-center justify-between shadow-lg animate-in slide-in-from-bottom-2">
+          <div className="flex flex-col min-w-0 pr-3">
+            <span className="text-xs font-bold text-indigo-400">
+              Replying to {replyingTo.sender?.displayName || replyingTo.sender?.username || 'Message'}
+            </span>
+            <p className="text-xs text-slate-300 truncate">
+              {replyingTo.content || (replyingTo.attachments?.length ? '📷 Attachment' : 'Message')}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onCancelReply}
+            className="p-1 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-slate-100 transition cursor-pointer"
+            title="Cancel reply"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
       {/* File Preview before sending */}
       {previewAttachment && (
         <div className="mb-2 sm:mb-3 p-2.5 sm:p-3 bg-slate-900/90 rounded-2xl border border-slate-800 flex items-center justify-between shadow-lg">
