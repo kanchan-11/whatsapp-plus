@@ -1,6 +1,37 @@
 version: '3.8'
 
 services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: instantping-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_NAME:-instantping}
+      POSTGRES_USER: ${DB_USER:-instantping_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-instantping_secret}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - instantping-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-instantping_user} -d ${DB_NAME:-instantping}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: instantping-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - instantping-net
+
   backend:
     build:
       context: ./backend
@@ -9,11 +40,23 @@ services:
     restart: always
     environment:
       - SPRING_PROFILES_ACTIVE=prod
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=${DB_NAME:-instantping}
+      - DB_USER=${DB_USER:-instantping_user}
+      - DB_PASSWORD=${DB_PASSWORD:-instantping_secret}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
       - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID:-}
       - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET:-}
     volumes:
       - app-data:/app/data
       - app-uploads:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
     networks:
       - instantping-net
     healthcheck:
@@ -35,17 +78,6 @@ services:
     networks:
       - instantping-net
 
-  redis:
-    image: redis:7-alpine
-    container_name: instantping-redis
-    restart: always
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis-data:/data
-    networks:
-      - instantping-net
-
 networks:
   instantping-net:
     driver: bridge
@@ -54,3 +86,4 @@ volumes:
   app-data:
   app-uploads:
   redis-data:
+  postgres-data:
