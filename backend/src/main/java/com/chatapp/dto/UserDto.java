@@ -43,7 +43,10 @@ public class UserDto {
     public String getStatusBio() { return statusBio; }
     public void setStatusBio(String statusBio) { this.statusBio = statusBio; }
 
+    @com.fasterxml.jackson.annotation.JsonProperty("isOnline")
     public boolean isOnline() { return isOnline; }
+
+    @com.fasterxml.jackson.annotation.JsonProperty("isOnline")
     public void setOnline(boolean online) { isOnline = online; }
 
     public LocalDateTime getLastSeen() { return lastSeen; }

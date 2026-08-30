@@ -11,8 +11,8 @@ export const ChatListItem = ({ chat, isSelected, onClick, currentUserId }) => {
   if (chat.type === 'DIRECT' && chat.members) {
     const otherMember = chat.members.find((m) => m.user?.id !== currentUserId);
     if (otherMember?.user) {
-      const presence = onlineUsers.get(otherMember.user.id);
-      isOtherUserOnline = presence ? presence.isOnline : otherMember.user.online;
+      const presence = onlineUsers.get(otherMember.user.id) || onlineUsers.get(Number(otherMember.user.id));
+      isOtherUserOnline = presence !== undefined ? Boolean(presence.isOnline) : Boolean(otherMember.user.online);
     }
   }
 

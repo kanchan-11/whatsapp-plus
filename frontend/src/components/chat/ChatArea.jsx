@@ -19,7 +19,7 @@ export const ChatArea = ({
   onBack,
 }) => {
   const { user } = useAuth();
-  const { subscribe, sendTyping } = useSocket();
+  const { subscribe, sendTyping, updateUserPresence } = useSocket();
   const { activeGroupCalls, joinActiveGroupCall, isGroupCall, groupInfo } = useCall();
 
   const [messages, setMessages] = useState([]);
@@ -75,6 +75,10 @@ export const ChatArea = ({
           onNewMessageReceived(chat.id, newMsg);
         }
 
+        if (newMsg.sender?.id) {
+          updateUserPresence(newMsg.sender.id, true);
+        }
+
         if (newMsg.sender?.id !== user?.id) {
           soundService.playMessageTone();
           chatService.markAsRead(chat.id);
@@ -111,6 +115,7 @@ export const ChatArea = ({
       try {
         const notification = JSON.parse(typingFrame.body);
         if (notification.userId !== user?.id) {
+          updateUserPresence(notification.userId, true);
           if (notification.typing) {
             setTypingUsers((prev) => {
               if (prev.some((u) => u.userId === notification.userId)) return prev;
@@ -130,8 +135,15 @@ export const ChatArea = ({
       try {
         const updatedMsg = JSON.parse(frame.body);
         setMessages((prev) => prev.map((m) => (m.id === updatedMsg.id ? updatedMsg : m)));
+        if (updatedMsg.reactions) {
+          updatedMsg.reactions.forEach((r) => {
+            if (r.users) {
+              r.users.forEach((u) => updateUserPresence(u.id, true));
+            }
+          });
+        }
       } catch (err) {
-        console.error('Failed to parse reaction update', err);
+        console.error('Failed to parse incoming reaction update', err);
       }
     });
 

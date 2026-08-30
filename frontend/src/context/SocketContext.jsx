@@ -36,7 +36,36 @@ export const SocketProvider = ({ children }) => {
     client.onConnect = () => {
       setIsConnected(true);
 
-      // Announce current user is online
+      // 1. Subscribe to global presence channel
+      try {
+        client.subscribe('/topic/presence', (message) => {
+          try {
+            const presence = JSON.parse(message.body);
+            if (presence && presence.userId) {
+              const onlineStatus = presence.isOnline !== undefined
+                ? Boolean(presence.isOnline)
+                : (presence.online !== undefined ? Boolean(presence.online) : false);
+
+              setOnlineUsers((prev) => {
+                const next = new Map(prev);
+                const val = {
+                  isOnline: onlineStatus,
+                  lastSeen: presence.lastSeen,
+                };
+                next.set(Number(presence.userId), val);
+                next.set(String(presence.userId), val);
+                return next;
+              });
+            }
+          } catch (e) {
+            console.error('Error parsing presence update', e);
+          }
+        });
+      } catch (e) {
+        console.error('Failed to subscribe to /topic/presence', e);
+      }
+
+      // 2. Announce current user is online
       try {
         client.publish({
           destination: '/app/user.presence',
@@ -48,27 +77,6 @@ export const SocketProvider = ({ children }) => {
         });
       } catch (e) {
         console.warn('Presence broadcast failed', e);
-      }
-
-      // Subscribe to global presence channel
-      try {
-        client.subscribe('/topic/presence', (message) => {
-          try {
-            const presence = JSON.parse(message.body);
-            setOnlineUsers((prev) => {
-              const next = new Map(prev);
-              next.set(presence.userId, {
-                isOnline: presence.isOnline,
-                lastSeen: presence.lastSeen,
-              });
-              return next;
-            });
-          } catch (e) {
-            console.error('Error parsing presence update', e);
-          }
-        });
-      } catch (e) {
-        console.error('Failed to subscribe to /topic/presence', e);
       }
 
       // Resubscribe any registered active dynamic subscriptions
@@ -213,11 +221,26 @@ export const SocketProvider = ({ children }) => {
     }
   }, []);
 
+  const updateUserPresence = useCallback((userId, isOnline, lastSeen) => {
+    if (!userId) return;
+    setOnlineUsers((prev) => {
+      const next = new Map(prev);
+      const val = {
+        isOnline: Boolean(isOnline),
+        lastSeen: lastSeen || new Date().toISOString(),
+      };
+      next.set(Number(userId), val);
+      next.set(String(userId), val);
+      return next;
+    });
+  }, []);
+
   return (
     <SocketContext.Provider
       value={{
         isConnected,
         onlineUsers,
+        updateUserPresence,
         stompClient: stompClientRef.current,
         subscribe,
         sendTyping,

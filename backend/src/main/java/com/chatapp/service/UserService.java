@@ -33,11 +33,18 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final PresenceService presenceService;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
+    public UserService(
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder,
+            JwtService jwtService,
+            @org.springframework.context.annotation.Lazy PresenceService presenceService
+    ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+        this.presenceService = presenceService;
     }
 
     @Transactional
@@ -337,6 +344,10 @@ public class UserService {
 
     public UserDto toDto(User user) {
         if (user == null) return null;
+        boolean isOnline = user.isOnline();
+        if (presenceService != null && user.getId() != null) {
+            isOnline = presenceService.isUserOnline(user.getId()) || user.isOnline();
+        }
         return new UserDto(
                 user.getId(),
                 user.getUsername(),
@@ -344,7 +355,7 @@ public class UserService {
                 user.getDisplayName(),
                 user.getAvatarUrl(),
                 user.getStatusBio(),
-                user.isOnline(),
+                isOnline,
                 user.getLastSeen()
         );
     }

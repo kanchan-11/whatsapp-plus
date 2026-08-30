@@ -1,11 +1,15 @@
 package com.chatapp.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDateTime;
 
 public class UserPresenceDto {
     private Long userId;
     private String username;
+
+    @JsonProperty("isOnline")
     private boolean isOnline;
+
     private LocalDateTime lastSeen;
 
     public UserPresenceDto() {}
@@ -23,7 +27,10 @@ public class UserPresenceDto {
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
 
+    @JsonProperty("isOnline")
     public boolean isOnline() { return isOnline; }
+
+    @JsonProperty("isOnline")
     public void setOnline(boolean online) { isOnline = online; }
 
     public LocalDateTime getLastSeen() { return lastSeen; }

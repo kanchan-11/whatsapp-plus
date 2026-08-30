@@ -19,8 +19,8 @@ export const ChatHeader = ({ chat, currentUserId, typingUsers, onOpenGroupInfo, 
     const otherMember = chat.members.find((m) => m.user?.id !== currentUserId);
     if (otherMember?.user) {
       otherUser = otherMember.user;
-      const presence = onlineUsers.get(otherUser.id);
-      isOtherOnline = presence ? presence.isOnline : otherUser.online;
+      const presence = onlineUsers.get(otherUser.id) || onlineUsers.get(Number(otherUser.id));
+      isOtherOnline = presence !== undefined ? Boolean(presence.isOnline) : Boolean(otherUser.online);
     }
   }
 

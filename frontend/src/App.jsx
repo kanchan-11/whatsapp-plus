@@ -18,7 +18,7 @@ import { Loader2, LogOut } from 'lucide-react';
 
 const MainLayout = () => {
   const { user, logout, isAuthenticated, isLoading: authLoading } = useAuth();
-  const { subscribe } = useSocket();
+  const { subscribe, updateUserPresence } = useSocket();
   const { startCall } = useCall();
 
   const [activeTab, setActiveTab] = useState('CHATS'); // 'CHATS' (default) or 'CALLS'
@@ -39,12 +39,24 @@ const MainLayout = () => {
     try {
       const data = await chatService.getChats();
       setChats(data);
+      if (Array.isArray(data) && updateUserPresence) {
+        data.forEach((c) => {
+          if (c.members) {
+            c.members.forEach((m) => {
+              if (m.user) {
+                const isOnline = Boolean(m.user.online || m.user.isOnline);
+                updateUserPresence(m.user.id, isOnline, m.user.lastSeen);
+              }
+            });
+          }
+        });
+      }
     } catch (err) {
       console.error('Failed to load chats', err);
     } finally {
       setIsLoadingChats(false);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, updateUserPresence]);
 
   // Fetch call history for user
   const fetchCallLogs = useCallback(async () => {
