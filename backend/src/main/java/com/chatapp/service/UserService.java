@@ -10,6 +10,8 @@ import com.chatapp.exception.ResourceNotFoundException;
 import com.chatapp.exception.UnauthorizedException;
 import com.chatapp.model.User;
 import com.chatapp.repository.UserRepository;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -285,6 +287,7 @@ public class UserService {
         return toDto(getCurrentUserEntity());
     }
 
+    @Cacheable(value = "users", key = "#id")
     public UserDto getUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
@@ -305,6 +308,7 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    @CacheEvict(value = "users", key = "#result.id")
     @Transactional
     public UserDto updateProfile(UpdateProfileRequest request) {
         User user = getCurrentUserEntity();
@@ -321,6 +325,7 @@ public class UserService {
         return toDto(updated);
     }
 
+    @CacheEvict(value = "users", key = "#userId")
     @Transactional
     public void setOnlineStatus(Long userId, boolean isOnline) {
         userRepository.findById(userId).ifPresent(user -> {

@@ -20,17 +20,20 @@ public class WebSocketChatController {
     private final MessageService messageService;
     private final UserService userService;
     private final UserRepository userRepository;
+    private final com.chatapp.service.PresenceService presenceService;
     private final SimpMessagingTemplate messagingTemplate;
 
     public WebSocketChatController(
             MessageService messageService,
             UserService userService,
             UserRepository userRepository,
+            com.chatapp.service.PresenceService presenceService,
             SimpMessagingTemplate messagingTemplate
     ) {
         this.messageService = messageService;
         this.userService = userService;
         this.userRepository = userRepository;
+        this.presenceService = presenceService;
         this.messagingTemplate = messagingTemplate;
     }
 
@@ -59,9 +62,19 @@ public class WebSocketChatController {
     @MessageMapping("/user.presence")
     public void handlePresence(@Payload UserPresenceDto presenceDto) {
         if (presenceDto != null && presenceDto.getUserId() != null) {
+            if (presenceDto.isOnline()) {
+                presenceService.markOnline(presenceDto.getUserId(), presenceDto.getUsername());
+            } else {
+                presenceService.markOffline(presenceDto.getUserId(), presenceDto.getUsername());
+            }
             userService.setOnlineStatus(presenceDto.getUserId(), presenceDto.isOnline());
-            presenceDto.setLastSeen(LocalDateTime.now());
-            messagingTemplate.convertAndSend("/topic/presence", presenceDto);
+        }
+    }
+
+    @MessageMapping("/user.heartbeat")
+    public void handleHeartbeat(@Payload UserPresenceDto presenceDto) {
+        if (presenceDto != null && presenceDto.getUserId() != null) {
+            presenceService.heartbeat(presenceDto.getUserId(), presenceDto.getUsername());
         }
     }
 }

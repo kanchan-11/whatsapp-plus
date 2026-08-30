@@ -102,7 +102,23 @@ export const SocketProvider = ({ children }) => {
     };
 
     client.activate();
-    stompClientRef.current = client;
+    // Periodic heartbeat to refresh Redis TTL presence
+    const heartbeatInterval = setInterval(() => {
+      if (client && client.connected && user?.id) {
+        try {
+          client.publish({
+            destination: '/app/user.heartbeat',
+            body: JSON.stringify({
+              userId: user.id,
+              username: user.username,
+              isOnline: true,
+            }),
+          });
+        } catch (e) {
+          // Ignore transient socket glitches
+        }
+      }
+    }, 25000);
 
     const handleBeforeUnload = () => {
       if (client && client.connected && user) {
@@ -122,6 +138,7 @@ export const SocketProvider = ({ children }) => {
     window.addEventListener('beforeunload', handleBeforeUnload);
 
     return () => {
+      clearInterval(heartbeatInterval);
       handleBeforeUnload();
       window.removeEventListener('beforeunload', handleBeforeUnload);
       client.deactivate();

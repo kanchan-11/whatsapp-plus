@@ -35,6 +35,17 @@ services:
     networks:
       - instantping-net
 
+  redis:
+    image: redis:7-alpine
+    container_name: instantping-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - instantping-net
+
 networks:
   instantping-net:
     driver: bridge
@@ -42,3 +53,4 @@ networks:
 volumes:
   app-data:
   app-uploads:
+  redis-data:
