@@ -197,13 +197,22 @@ export const ChatArea = ({
 
   const handleSendMessage = async (msgData) => {
     try {
-      await chatService.sendMessage({
+      const sent = await chatService.sendMessage({
         chatId: chat.id,
         content: msgData.content,
         type: msgData.type,
         attachments: msgData.attachments,
         replyToId: msgData.replyToId,
       });
+      if (sent) {
+        setMessages((prev) => {
+          if (prev.some((m) => m.id === sent.id)) return prev;
+          return [...prev, sent];
+        });
+        if (onNewMessageReceived) {
+          onNewMessageReceived(chat.id, sent);
+        }
+      }
       setReplyingTo(null);
     } catch (err) {
       console.error('Failed to send message', err);

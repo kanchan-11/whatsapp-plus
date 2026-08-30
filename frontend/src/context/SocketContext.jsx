@@ -22,19 +22,13 @@ export const SocketProvider = ({ children }) => {
       return;
     }
 
-    const isHttps = window.location.protocol === 'https:';
-    const wsProtocol = isHttps ? 'wss:' : 'ws:';
-    const brokerURL = `${wsProtocol}//${window.location.host}/ws`;
-
     const client = new Client({
-      brokerURL: brokerURL,
-      // Fallback to SockJS if pure WebSocket connection fails
       webSocketFactory: () => new SockJS(`${window.location.protocol}//${window.location.host}/ws`),
       connectHeaders: {
         Authorization: `Bearer ${token}`,
       },
       debug: () => {},
-      reconnectDelay: 4000,
+      reconnectDelay: 3000,
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,
     });
@@ -81,7 +75,9 @@ export const SocketProvider = ({ children }) => {
       subscriptionsMapRef.current.forEach((subObj, id) => {
         try {
           if (client.connected) {
-            subObj.stompSub = client.subscribe(subObj.destination, subObj.callback);
+            subObj.stompSub = client.subscribe(subObj.destination, (frame) => {
+              if (subObj.callback) subObj.callback(frame);
+            });
           }
         } catch (err) {
           console.error(`Failed to bind subscription for ${subObj.destination}`, err);
@@ -102,6 +98,8 @@ export const SocketProvider = ({ children }) => {
     };
 
     client.activate();
+    stompClientRef.current = client;
+
     // Periodic heartbeat to refresh Redis TTL presence
     const heartbeatInterval = setInterval(() => {
       if (client && client.connected && user?.id) {
@@ -158,7 +156,9 @@ export const SocketProvider = ({ children }) => {
 
     if (stompClientRef.current && stompClientRef.current.connected) {
       try {
-        subObj.stompSub = stompClientRef.current.subscribe(destination, callback);
+        subObj.stompSub = stompClientRef.current.subscribe(destination, (frame) => {
+          if (callback) callback(frame);
+        });
       } catch (err) {
         console.error(`Failed to subscribe immediately to ${destination}`, err);
       }
